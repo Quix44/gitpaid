@@ -1,0 +1,14 @@
+{
+  "name": "hardhat-project",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "latest",
+    "ethers": "latest",
+    "hardhat": "latest"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-ethers": "latest",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "latest",
+    "dotenv": "latest"
+  }
+}
