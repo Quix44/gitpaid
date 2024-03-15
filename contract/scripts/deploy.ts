@@ -10,7 +10,7 @@ async function main() {
   const ArbToken = await ethers.getContractFactory("MockERC20");
   const USDC = await ethers.getContractFactory("MockERC20");
 
-  const updaterAddress = await addr2.getAddress()
+  const updaterAddress = "0xb6D9f614907368499bAF7b288b54B839fC891660"
 
   const gitpaid = await GitPaid.deploy(updaterAddress);
   const apeCoin = await ApeCoin.deploy("ApeCoin", "APE", ethers.parseEther("1000000000"))
