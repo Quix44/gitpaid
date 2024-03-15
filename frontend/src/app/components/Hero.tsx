@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 function Hero() {
     return (
-        <section className="grid grid-cols-12 bg-primary rounded-lg items-center">
+        <section className="grid grid-cols-12 bg-primary  items-center rounded-lg">
             <div className="col-span-5">
                 <Image
                     src="/Octocatlogo.png"
@@ -19,14 +19,14 @@ function Hero() {
                     Dollar Dollar bills.
                 </h1>
                 <p className="leading-7 [&:not(:first-child)]:mt-6">
-                    Code for cash, not just claps. Join us where open-source effort pays off, literally. Because who says passion projects can't fill your pockets? Let's make earning fun, one line of code at a time!
+                    Code for cash, not just claps. Join us where open-source effort pays off, literally. Because who says passion projects cant fill your pockets? Lets make earning fun, one line of code at a time!
                 </p>
-                <Button className="mt-6">Sign up</Button>
+                <Button variant={"secondary"} className="mt-6">Sign up</Button>
 
 
             </div>
 
-        </section>
+        </section >
 
     )
 }
