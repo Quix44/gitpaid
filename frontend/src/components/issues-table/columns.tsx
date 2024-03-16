@@ -112,10 +112,7 @@ export const columns: ColumnDef<IssueTask>[] = [
         (status) => status.value === row.getValue("status")
       )
 
-
-
-
-      const isStatusPresent = Boolean(status); // Determines if status is present
+      const isStatusPresent = status?.value === 'open'
       const textColorClass = isStatusPresent ? 'text-green-500' : 'text-red-500'; // Choose color based on status presence
 
       if (!status) {
@@ -135,11 +132,16 @@ export const columns: ColumnDef<IssueTask>[] = [
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-red-500">No Status</span>
+                  <span className="text-yellow-500">Paid</span>
                 </TooltipTrigger>
-                <TooltipContent className="bg-card">
-                  <h4 className="font-medium leading-none">Status Unavailable</h4>
-                  {/* You can add more context or remove these placeholders as needed */}
+                <TooltipContent className="bg-card max-w-sm space-y-2">
+                  <h4 className="font-medium leading-none">Issue resolved</h4>
+                  <p className="text-sm text-muted-foreground">
+                    amount: <b>{row.original.amount}</b>
+                  </p>
+                  <p className="text-sm text-muted-foreground line-clamp-2 max-w[60px] text-ellipsis ">
+                    resolved by: <b>{row.original.transactionId}</b>
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

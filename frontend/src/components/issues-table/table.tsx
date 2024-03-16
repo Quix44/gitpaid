@@ -23,7 +23,11 @@ async function getIssues() {
         outputIssues.push({
             id: issue.Data.Issue.Number,
             repository: issue.Data.Repo.Name,
+            solverAvatar: issue.Metadata?.solverAvatar || issue.Data.Sender.AvatarURL,
+            solverUsername: issue.Data.Sender.Login,
+            transactionId: issue.Metadata?.txID || "NA",
             description: issue.Data.Issue.Title,
+            amount: issue.Metadata?.amount || "NA",
             creator: issue.Data.Sender.Login,
             url: issue.Data.Issue.HTMLURL,
             avatar: issue.Data.Sender.AvatarURL,
@@ -67,6 +71,10 @@ interface DataResponse {
 
 interface IssueMetadata {
     label: string
+    amount: string
+    txID: string
+    solverAvatar: string
+    solverUsername: string
 }
 
 interface IssueObject {

@@ -12,6 +12,10 @@ export const issueSchema = z.object({
   avatar: z.string().optional(),
   language: z.string().optional(),
   url: z.string(),
+  transactionId: z.string().optional(),
+  amount: z.string().optional(),
+  solverUsername: z.string().optional(),
+  solverAvatar: z.string().optional(),
 })
 
 export const repoSchema = z.object({
