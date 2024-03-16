@@ -7,6 +7,9 @@ import Image from "next/image"
 import { statuses } from "../data/data"
 import { IssueTask } from "../data/schema"
 import { Badge } from "../ui/badge"
+import {
+  Tooltip
+} from "../ui/tooltip"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
@@ -109,13 +112,22 @@ export const columns: ColumnDef<IssueTask>[] = [
       if (!status) {
         return null
       }
+      const textColorClass = status ? 'text-green-500' : 'text-red-500';
 
       return (
         <div className="flex w-[100px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+          {status && status.icon && (
+            <status.icon className={`mr-2 h-4 w-4 ${textColorClass}`} />
           )}
-          <span>{status.label}</span>
+          {!status ? (
+            // When there's no status, wrap the "No Status" text in a Tooltip
+            <Tooltip content="No Status Available" position="top">
+              <span className={textColorClass}>No Status</span>
+            </Tooltip>
+          ) : (
+            // Render status label with appropriate text color when status exists
+            <span className={textColorClass}>{status.label}</span>
+          )}
         </div>
       )
     },
