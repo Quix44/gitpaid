@@ -108,7 +108,15 @@ export function FundButton({ repository, connected }: { repository: string, conn
                         </Label>
                         <Input onChange={(e) => setAmount(Number(e.target.value))} type="number" placeholder="Amount" id="link" />
                     </div>
-                    <Button variant={'secondary'} size="sm" className="px-3" onClick={(e) => {
+
+                </div>
+                <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                        <Button type="button" variant="ghost">
+                            Close
+                        </Button>
+                    </DialogClose>
+                    <Button variant={'secondary'} onClick={(e) => {
                         e.preventDefault()
                         if (allowance === 0n) {
                             approvalWrite?.()
@@ -119,13 +127,6 @@ export function FundButton({ repository, connected }: { repository: string, conn
 
                         {isApproving || isFundLoading ? <Loader2 className="animate-spin w-6 h-6" /> : allowance === 0n ? "Approve" : fundRepository ? "Fund" : "???"}
                     </Button>
-                </div>
-                <DialogFooter className="sm:justify-start">
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                            Close
-                        </Button>
-                    </DialogClose>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
