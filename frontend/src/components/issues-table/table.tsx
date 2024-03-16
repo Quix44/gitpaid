@@ -7,8 +7,8 @@ import { z } from "zod"
 import { issueSchema } from "../data/schema"
 
 export const metadata: Metadata = {
-    title: "Tasks",
-    description: "A task and issue tracker build using Tanstack Table.",
+    title: "Issues Dashboard",
+    description: "Gitpaid Issues Dashboard.",
 }
 
 // Simulate a database read for tasks.
@@ -18,18 +18,20 @@ async function getIssues() {
     const response = await fetch(url, { method: 'POST' })
 
     const jsonData = await response.json()
-    const _data: IssueObject[] = jsonData.body.map((y: { Data: any }) => y.Data)
+    const _data: DataResponse[] = jsonData.body.map((y: { Data: any }) => y)
     const outputIssues = []
-    for (const issue of _data) {
+    for (const issue of jsonData.body as DataResponse[]) {
+        console.log(issue)
         outputIssues.push({
-            id: issue.Issue.ID,
-            repository: issue.Repo.Name,
-            description: issue.Issue.Title,
-            creator: issue.Sender.Login,
-            label: "No Label", // issue.Issue.Labels[0]?.name
-            status: issue.Issue.State
+            id: issue.Data.Issue.Number,
+            repository: issue.Data.Repo.Name,
+            description: issue.Data.Issue.Title,
+            creator: issue.Data.Sender.Login,
+            label: issue.Metadata?.label || "No Label",
+            status: issue.Data.Issue.State
         })
     }
+
     return z.array(issueSchema).parse(outputIssues);
 }
 
@@ -56,9 +58,19 @@ export async function Table() {
 
 export default Table
 
+interface DataResponse {
+    ID: string
+    Metadata: IssueMetadata
+    Data: IssueObject
+}
+
+interface IssueMetadata {
+    label: string
+}
 
 interface IssueObject {
     Action: string;
+    metadata: IssueMetadata;
     Assignee?: any;
     Changes?: any;
     Installation?: any;
