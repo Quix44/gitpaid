@@ -46,7 +46,7 @@ export async function Table({ username }: { username: string | null }) {
                 <RepoInfoRow />
                 <div className="flex justify-between w-full">
                     <div>
-                        <h2 className="text-2xl font-bold tracking-tight title text-white">Here are your repositories</h2>
+                        <h2 className="text-2xl font-bold tracking-tight title text-card-foreground">Here are your repositories</h2>
                         <p className="text-muted-foreground">
                             Connect, Fund and start creating GitHub Issues!
                         </p>
