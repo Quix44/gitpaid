@@ -27,8 +27,9 @@ async function getIssues() {
             creator: issue.Data.Sender.Login,
             url: issue.Data.Issue.HTMLURL,
             avatar: issue.Data.Sender.AvatarURL,
-            label: issue.Metadata?.label || "No Label",
-            status: issue.Data.Issue.State
+            label: issue.Metadata?.label || issue.Data.Issue.Labels.find(label => label)?.Name || "NA",
+            status: issue.Data.Issue.State,
+            language: issue.Data.Repo.Language || "NA",
         })
     }
 

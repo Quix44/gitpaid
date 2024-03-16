@@ -9,7 +9,8 @@ export const issueSchema = z.object({
   creator: z.string(),
   label: z.string(),
   status: z.string(),
-  avatar: z.string(),
+  avatar: z.string().optional(),
+  language: z.string().optional(),
   url: z.string(),
 })
 

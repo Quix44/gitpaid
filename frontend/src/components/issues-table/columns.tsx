@@ -59,7 +59,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium flex">
-            <Image src={row.original.avatar} className="rounded-full" alt={row.original.creator} width={34} height={34} />
+            {row.original.avatar && <Image src={row.original.avatar} className="rounded-full" alt={row.original.creator} width={34} height={34} />}
             {<p className="mt-2 ml-1">{row.getValue("creator")}</p>}
           </span>
         </div>
@@ -76,6 +76,21 @@ export const columns: ColumnDef<Task>[] = [
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
             {row.original.label && <Badge variant="outline">{row.original.label}</Badge>}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "language",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Language" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.original.language && <Badge variant="outline">{row.original.language}</Badge>}
           </span>
         </div>
       )
