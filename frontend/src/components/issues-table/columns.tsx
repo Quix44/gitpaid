@@ -5,12 +5,12 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import Image from "next/image"
 import { statuses } from "../data/data"
-import { Task } from "../data/schema"
+import { IssueTask } from "../data/schema"
 import { Badge } from "../ui/badge"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
-export const columns: ColumnDef<Task>[] = [
+export const columns: ColumnDef<IssueTask>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (
