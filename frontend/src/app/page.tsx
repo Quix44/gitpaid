@@ -1,7 +1,7 @@
-import Helpinfo from "./components/Helpinfo";
-import Hero from "./components/Hero";
-import Searchinfo from "./components/Searchinfo";
-import Statrow from "./components/Statrow";
+import Helpinfo from "@/components/Helpinfo";
+import Hero from "@/components/Hero";
+import Searchinfo from "@/components/Searchinfo";
+import Statrow from "@/components/Statrow";
 
 export default function Home() {
   return (
