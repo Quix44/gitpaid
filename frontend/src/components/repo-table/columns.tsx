@@ -42,7 +42,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.url)}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[200px] truncate font-medium">
+          <span className="max-w-[300px] truncate font-medium">
             {row.getValue("description")}
           </span>
         </div>
@@ -60,7 +60,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.fundedAmount)}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[200px] truncate font-medium">
+          <span className="max-w-[50px] truncate font-medium">
             {row.getValue("fundedAmount")}
           </span>
         </div>
@@ -154,7 +154,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex w-[100px] items-center">
           <Provider>
-            <FundButton repository={String(row.original.id)} />
+            <FundButton connected={row.original.connected} repository={String(row.original.id)} />
           </Provider>
         </div>
       )

@@ -38,7 +38,7 @@ export function ConnectRepositoryButton({ connected }: ConnectRepositoryButtonPr
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="ghost" className={`${connected ? "bg-green-900 hover:bg-green-900" : "bg-red-900 hover:bg-red-900 animate-pulse"} `}>{buttonText}</Button>
+                <Button variant="ghost" className={`${connected ? "bg-green-900 text-xs hover:bg-green-900 w-28 h-22" : "bg-red-900 hover:bg-red-900 animate-pulse w-28 h-22 text-xs"} `}>{buttonText}</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>

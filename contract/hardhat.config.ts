@@ -34,6 +34,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       arbSepolia: process.env.ARBISCAN_API_KEY as string,
+      baseSepolia: process.env.BASESCAN_API_KEY as string,
     },
     customChains: [
       {
@@ -42,6 +43,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-sepolia.arbiscan.io/api",
           browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+      {
+        network: "baseSepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
         },
       },
     ],
