@@ -23,6 +23,7 @@ export const repoSchema = z.object({
   amount: z.string().optional(),
   label: z.union([z.string(), z.undefined(), z.null()]),
   status: z.string().optional(),
+  url: z.string().optional(),
 })
 
 export type IssueTask = z.infer<typeof issueSchema>
