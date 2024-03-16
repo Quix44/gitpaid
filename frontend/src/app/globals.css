@@ -43,3 +43,6 @@
     @apply bg-background text-foreground;
   }
 }
+.bg-gradient {
+  background: var(--gradient);
+}
