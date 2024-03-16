@@ -34,13 +34,13 @@ type LambdaEvent struct {
 }
 
 type User struct {
-	ID             string            `json:"id" dynamodbav:"id"`
-	GitHubUsername string            `json:"githubUsername" dynamodbav:"githubUsername"`
-	Typename       string            `json:"typename" dynamodbav:"typename"`
-	Data           WalletLinkData    `json:"metadata" dynamodbav:"metadata"`
-	CreatedAt      time.Time         `json:"createdAt" dynamodbav:"createdAt"`
-	UpdatedAt      time.Time         `json:"updatedAt" dynamodbav:"updatedAt"`
-	Metadata       map[string]string `json:"metadata" dynamodbav:"metadata"`
+	ID             string `json:"id" dynamodbav:"id"`
+	GitHubUsername string `json:"githubUsername" dynamodbav:"githubUsername"`
+	Typename       string `json:"typename" dynamodbav:"typename"`
+	// Data           WalletLinkData `json:"metadata" dynamodbav:"metadata"`
+	CreatedAt time.Time         `json:"createdAt" dynamodbav:"createdAt"`
+	UpdatedAt time.Time         `json:"updatedAt" dynamodbav:"updatedAt"`
+	Metadata  map[string]string `json:"metadata" dynamodbav:"metadata"`
 }
 
 type WalletLinkData struct {
@@ -195,12 +195,12 @@ type DynamoIssuesEventItem struct {
 }
 
 type DynamoRepoItem struct {
-	ID        string     `json:"id" dynamodbav:"id"`
-	Typename  string     `json:"typename" dynamodbav:"typename"`
-	CreatedAt time.Time  `json:"createdAt" dynamodbav:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt" dynamodbav:"updatedAt"`
-	Data      GithubRepo `json:"data" dynamodbav:"data"`
-	// Metadata  RepoMetadata `json:"metadata" dynamodbav:"metadata"`
+	ID        string            `json:"id" dynamodbav:"id"`
+	Typename  string            `json:"typename" dynamodbav:"typename"`
+	CreatedAt time.Time         `json:"createdAt" dynamodbav:"createdAt"`
+	UpdatedAt time.Time         `json:"updatedAt" dynamodbav:"updatedAt"`
+	Data      GithubRepo        `json:"data" dynamodbav:"data"`
+	Metadata  map[string]string `json:"metadata" dynamodbav:"metadata"`
 }
 
 type DynamoLabelEventItem struct {
@@ -210,15 +210,6 @@ type DynamoLabelEventItem struct {
 	UpdatedAt time.Time          `json:"updatedAt" dynamodbav:"updatedAt"`
 	Data      *github.LabelEvent `json:"data" dynamodbav:"data"`
 	Metadata  map[string]string  `json:"metadata" dynamodbav:"metadata"`
-}
-
-type RepoMetadata struct {
-	ChainID      string `json:"chainID" dynamodbav:"chainID"`
-	RPC          string `json:"rpc" dynamodbav:"rpc"`
-	TokenAddress string `json:"tokenAddress" dynamodbav:"tokenAddress"`
-	PayeeAddress string `json:"payeeAddress" dynamodbav:"payeeAddress"`
-	Amount       uint64 `json:"amount" dynamodbav:"amount"`
-	Active       bool   `json:"active" dynamodbav:"active"`
 }
 
 func init() {
@@ -295,6 +286,10 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 			// issue closed, now go and find the PR for the issue using github api
 			if *event.Action == "closed" {
 				log.Printf("Issue closed")
+
+				/*
+					OBTAIN LABEL AND PULL REQUEST OBJECTS
+				*/
 				shouldPay, paymentLabel, pullRequest, err := shouldPayUser(event)
 				if err != nil {
 					log.Printf("Error checking if user should be paid: %s", err)
@@ -315,6 +310,9 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 					// 1. Get the users name, then get the users record from dynamo (User object)
 					// 2. Get the repo object to get the payment metadata (contract address etc)
 					// 3. Pay the user by calling the contract
+					/*
+						OBTAIN THE REPO AND USER OBJECTS
+					*/
 					keyCondition := expression.Key("typename").Equal(expression.Value("Repository"))
 					log.Printf("Repo name: %s", *pullRequest.Base.Repo.Name)
 					filter := expression.Name("data.name").Equal(expression.Value(*pullRequest.Base.Repo.Name))
@@ -354,10 +352,10 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 							IsBase64Encoded: false,
 						}, nil
 					}
-					// repoMetadata := dynamoRepoItem[0].Metadata
-					repoMetadata := make(map[string]string)
-					log.Printf("Repo Metadata: %+v", repoMetadata)
-					paymentAddress, addressErr := getPaymentAddress(ctx, *pullRequest.User.Email)
+					repo := dynamoRepoItem[0]
+					// repoMetadata := make(map[string]string)
+					log.Printf("Repo Metadata: %+v", repo.Metadata)
+					paymentAddress, addressErr := getPaymentAddress(ctx, *pullRequest.User.Login)
 					amount, err := parseAmount(paymentLabel.Name)
 					log.Printf("Payment Address: %s", paymentAddress)
 					log.Printf("Amount: %d", amount)
@@ -376,12 +374,12 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 					}
 
 					log.Printf("READY TO PAY USER ... INPUTS ARE")
-					log.Printf("Repo Metadata: %+v", repoMetadata)
+					log.Printf("Repo Metadata: %+v", repo.Metadata)
 					log.Printf("Payment Address: %s", paymentAddress)
 					log.Printf("Amount: %d", amount)
-					log.Printf("User Name: %s", *pullRequest.User.Email)
-
-					//payUser(ctx, repoMetadata, paymentAddress, amount, dynamoRepoItem[0].Data.Name)
+					log.Printf("User Name: %s", *pullRequest.User.Login)
+					log.Printf("Finished")
+					payUser(ctx, repo.Metadata, paymentAddress, amount, repo.ID)
 				}
 			}
 		} else {
@@ -483,10 +481,11 @@ func getPaymentAddress(ctx context.Context, userName string) (string, error) {
 	}
 	dynamoRepoItem, err := QueryDynamoDB[User](ctx, queryInput)
 	if len(dynamoRepoItem) == 0 || err != nil {
-		return "", fmt.Errorf("failed to query DynamoDB: %w", err)
+		return "error obtaining wallet address for user to be paid", fmt.Errorf("failed to query DynamoDB: %w", err)
 	}
 
 	paymentAddress := &dynamoRepoItem[0]
+	log.Printf("Payment Address: %+v", paymentAddress)
 	if paymentAddress.Metadata == nil || paymentAddress.Metadata["publicKey"] == "" {
 		return "", fmt.Errorf("no payment address found")
 	}
@@ -810,7 +809,7 @@ func handlePingEvent(ctx context.Context, repoName string) (string, error) {
 	}
 	_repo := repo[0]
 
-	// _repo.Metadata.Active = true
+	_repo.Metadata["active"] = "true"
 	PutItemInDynamoDB(ctx, _repo)
 
 	return "success", nil

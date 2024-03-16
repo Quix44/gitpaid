@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
+	"log"
 	"math/big"
 	"os"
 	"strconv"
@@ -17,13 +18,22 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-func payUser(_ context.Context, repoMetadata RepoMetadata, paymentAddress string, amount int, repo string) (*common.Hash, error) {
+func payUser(_ context.Context, repoMetadata map[string]string, paymentAddress string, amount int, repo string) (*common.Hash, error) {
 	pk := os.Getenv("HACKATHON_PK")
 	if pk == "" {
 		return nil, fmt.Errorf("private Key not set in environment")
 	}
 
-	targetContractAddress := repoMetadata.PayeeAddress
+	// targetContractAddress := repoMetadata.PayeeAddress
+	targetContractAddress := repoMetadata["contractAddress"]
+	rpc := repoMetadata["rpc"]
+	tokenAddress := repoMetadata["tokenAddress"]
+	chainID := repoMetadata["chainID"]
+
+	log.Printf("targetContractAddress: %s", targetContractAddress)
+	log.Printf("rpc: %s", rpc)
+	log.Printf("tokenAddress: %s", tokenAddress)
+	log.Printf("chainID: %s", chainID)
 
 	// Parse the contract ABI or we could load it from a file then parse it rather than env
 	parsedABI, err := abi.JSON(strings.NewReader(contractABI))
@@ -32,18 +42,17 @@ func payUser(_ context.Context, repoMetadata RepoMetadata, paymentAddress string
 	}
 
 	// Set up Ethereum client
-	client, err := ethclient.Dial(repoMetadata.RPC)
+	client, err := ethclient.Dial(rpc)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Ethereum client: %v", err)
 	}
 
-	// Get the planPriceID from the Stripe event
-	tokenAddress := repoMetadata.TokenAddress
-	// repository := tokenMetadata.Repository
-	payeeAddress := repoMetadata.PayeeAddress
+	// Assuming amount is an int or int64, convert it to *big.Int
+	decimalPlaces := big.NewInt(1_000_000_000_000_000_000)
 
-	// amount = big.NewInt(0).SetInt64(_amount)
-	inputData, err := parsedABI.Pack("pay", &tokenAddress, repo, &payeeAddress, amount)
+	bigAmount := big.NewInt(int64(amount))
+
+	inputData, err := parsedABI.Pack("pay", common.HexToAddress(tokenAddress), &repo, common.HexToAddress(paymentAddress), new(big.Int).Mul(bigAmount, decimalPlaces))
 	if err != nil {
 		return nil, fmt.Errorf("failed to pack input data: %v", err)
 	}
@@ -72,7 +81,7 @@ func payUser(_ context.Context, repoMetadata RepoMetadata, paymentAddress string
 	}
 
 	// Get the gas price
-	gasLimit := uint64(81000) // We can lower this or do a suggestion call to get the gas limit
+	gasLimit := uint64(1000000) // We can lower this or do a suggestion call to get the gas limit
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("error getting gas price: %v", err)
@@ -81,7 +90,7 @@ func payUser(_ context.Context, repoMetadata RepoMetadata, paymentAddress string
 	// Create the transaction
 	tx := types.NewTransaction(nonce, contractAddress, big.NewInt(int64(0)), gasLimit, gasPrice, inputData)
 
-	chainId, err := strconv.Atoi(repoMetadata.ChainID)
+	chainId, err := strconv.Atoi(chainID)
 	if err != nil {
 		return nil, fmt.Errorf("error converting chain ID to int: %v", err)
 	}
