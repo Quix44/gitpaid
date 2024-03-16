@@ -113,8 +113,6 @@ export const columns: ColumnDef<IssueTask>[] = [
       )
 
 
-
-
       const isStatusPresent = Boolean(status); // Determines if status is present
       const textColorClass = isStatusPresent ? 'text-green-500' : 'text-red-500'; // Choose color based on status presence
 

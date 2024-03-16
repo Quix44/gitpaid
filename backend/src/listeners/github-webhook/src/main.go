@@ -47,13 +47,12 @@ type PaymentInfo struct {
 }
 
 type User struct {
-	ID             string `json:"id" dynamodbav:"id"`
-	GitHubUsername string `json:"githubUsername" dynamodbav:"githubUsername"`
-	Typename       string `json:"typename" dynamodbav:"typename"`
-	// Data           WalletLinkData `json:"metadata" dynamodbav:"metadata"`
-	CreatedAt time.Time         `json:"createdAt" dynamodbav:"createdAt"`
-	UpdatedAt time.Time         `json:"updatedAt" dynamodbav:"updatedAt"`
-	Metadata  map[string]string `json:"metadata" dynamodbav:"metadata"`
+	ID             string            `json:"id" dynamodbav:"id"`
+	GitHubUsername string            `json:"githubUsername" dynamodbav:"githubUsername"`
+	Typename       string            `json:"typename" dynamodbav:"typename"`
+	CreatedAt      time.Time         `json:"createdAt" dynamodbav:"createdAt"`
+	UpdatedAt      time.Time         `json:"updatedAt" dynamodbav:"updatedAt"`
+	Metadata       map[string]string `json:"metadata" dynamodbav:"metadata"`
 }
 
 type WalletLinkData struct {
@@ -264,7 +263,7 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 		if err := json.Unmarshal(payload, &eventMap); err != nil {
 			log.Fatalf("Failed to unmarshal Event string: %s", err)
 		}
-		handlePingEvent(ctx, eventMap.Repository.Name)
+		handlePingEvent(ctx, eventMap.Repository.ID)
 		return events.APIGatewayProxyResponse{
 			StatusCode: 200, // OK
 			Headers: map[string]string{
@@ -837,9 +836,9 @@ func QueryDynamoDB[T any](ctx context.Context, queryInput dynamodb.QueryInput) (
 	return items, nil
 }
 
-func handlePingEvent(ctx context.Context, repoName string) (string, error) {
+func handlePingEvent(ctx context.Context, repoID int) (string, error) {
 	keyCondition := expression.Key("typename").Equal(expression.Value("Repository"))
-	filter := expression.Name("data.name").Equal(expression.Value(repoName))
+	filter := expression.Name("data.id").Equal(expression.Value(repoID))
 
 	expr, err := expression.NewBuilder().
 		WithKeyCondition(keyCondition).

@@ -44,7 +44,7 @@ export function ConnectRepositoryButton({ connected }: ConnectRepositoryButtonPr
                 <DialogHeader>
                     <DialogTitle>Connect Repository</DialogTitle>
                     <DialogDescription>
-                        Place in your repository Settings {'>'} Webhooks and select {"Send me everything"}.
+                        Place in your repository Settings {'>'} Webhooks {'>'} Select application/json {'>'} Select {"Send me everything"} {'>'} Save webhook.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex items-center space-x-2">
