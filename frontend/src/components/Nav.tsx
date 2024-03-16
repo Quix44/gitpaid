@@ -13,7 +13,7 @@ function Nav() {
             <Link legacyBehavior={true} href="/">
                 <Image src="/logo.svg" alt="logo" width={112} height={40} />
             </Link>
-            <div className="flex space-between items-center">
+            <div className="flex space-between items-center space-x-4">
 
                 <Provider>
 

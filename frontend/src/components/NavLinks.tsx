@@ -19,12 +19,12 @@ function NavLinks() {
             {isLoaded && user ? (
                 <>
                     {isAuthenticated ? <Button variant="link" asChild>
-                        <Link legacyBehavior={true} href={`/repositories/?username=${githubUsername}`}>
+                        <Link href={`/repositories/?username=${githubUsername}`}>
                             My Repositories
                         </Link>
                     </Button> : null}
                     <Button variant="link" asChild>
-                        <Link legacyBehavior={true} href="/issues">
+                        <Link href="/issues">
                             Open Issues
                         </Link>
                     </Button>
