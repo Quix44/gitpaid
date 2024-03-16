@@ -3,7 +3,7 @@ import Image from 'next/image'
 function Statrow() {
     return (
         <section className="grid grid-cols-12 my-8 w-full">
-            <div className="grid col-span-4 bg-red-900 grid-cols-subgrid rounded-m items-center h-[158px]">
+            <div className="grid col-span-4 bg-red-900 grid-cols-subgrid rounded-md items-center h-[158px]">
                 <div className="col-span-2">
                     <Image
                         src="/Nounswizard.png"
@@ -24,7 +24,7 @@ function Statrow() {
                     </p>
                 </div>
             </div>
-            <div className="grid col-span-4 grid-cols-subgrid items-center bg-orange-400 rounded-m mx-2">
+            <div className="grid col-span-4 grid-cols-subgrid items-center bg-orange-400 rounded-md mx-2">
                 <div className="col-span-2">
                     <Image
                         src="/Nounszebra.png"
@@ -45,7 +45,7 @@ function Statrow() {
                     </p>
                 </div>
             </div>
-            <div className="grid col-span-4 grid-cols-subgrid items-center bg-lime-700 rounded-m mx-2">
+            <div className="grid col-span-4 grid-cols-subgrid items-center bg-lime-700 rounded-md">
                 <div className="col-span-2">
                     <Image
                         src="/Nounsunicorn.png"

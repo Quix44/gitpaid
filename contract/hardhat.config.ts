@@ -28,6 +28,24 @@ const config: HardhatUserConfig = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
   },
+  sourcify: {
+    enabled: true,
+  },
+  etherscan: {
+    apiKey: {
+      arbSepolia: process.env.ARBISCAN_API_KEY as string,
+    },
+    customChains: [
+      {
+        network: "arbSepolia",
+        chainId: 421614,
+        urls: {
+          apiURL: "https://api-sepolia.arbiscan.io/api",
+          browserURL: "https://sepolia.arbiscan.io/",
+        },
+      },
+    ],
+  },
 };
 
 export default config;
