@@ -13,8 +13,6 @@ const openRepo = (repoURL: string | undefined) => {
   window.open(repoURL, '_blank', 'noopener,noreferrer');
 }
 export const columns: ColumnDef<RepositoryTask>[] = [
-
-
   // {
   //   id: "select",
   //   header: ({ table }) => (
