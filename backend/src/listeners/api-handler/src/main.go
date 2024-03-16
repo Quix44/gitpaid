@@ -200,7 +200,7 @@ func handleListLabelsRequest(request events.APIGatewayV2HTTPRequest) (events.API
 func handleListIssuesRequest(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
 	// targetUser := request.QueryStringParameters["user"]
 	keyCondition := expression.Key("typename").Equal(expression.Value("Issue"))
-	filter := expression.Name("metadata.label").NotEqual(expression.Value(nil))
+	filter := expression.Name("data.Issue.Labels").NotEqual(expression.Value(nil))
 
 	expr, err := expression.NewBuilder().
 		WithKeyCondition(keyCondition).

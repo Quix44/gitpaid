@@ -1,8 +1,12 @@
+import Table from "@/components/issues-table/table";
 
-function page() {
+function Page() {
     return (
-        <div>issues page</div>
+        <main className="p-24">
+            <Table />
+        </main>
+
     )
 }
 
-export default page
+export default Page
