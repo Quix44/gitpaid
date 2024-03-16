@@ -9,7 +9,7 @@ function Page({
 }) {
 
     return (
-        <main className="p-24">
+        <main className="pb-24 pl-24 pr-24">
             <Table username={searchParams?.username as string || null} />
         </main>
     )
