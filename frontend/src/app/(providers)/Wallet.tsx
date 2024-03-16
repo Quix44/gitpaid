@@ -2,6 +2,7 @@
 
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core';
+import { useRouter } from "next/navigation";
 
 const Provider = ({ children }: any) => {
     const router = useRouter()
