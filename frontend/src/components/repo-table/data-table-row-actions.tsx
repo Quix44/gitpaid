@@ -8,17 +8,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
-  DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 
-import { labels } from "../data/data"
 import { repoSchema } from "../data/schema"
 
 interface DataTableRowActionsProps<TData> {
@@ -48,7 +44,7 @@ export function DataTableRowActions<TData>({
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
+          {/* <DropdownMenuSubContent>
             {task.label ? <DropdownMenuRadioGroup value={task.label}>
               {labels.map((label) => (
                 <DropdownMenuRadioItem key={label.value} value={label.value}>
@@ -56,7 +52,7 @@ export function DataTableRowActions<TData>({
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup> : null}
-          </DropdownMenuSubContent>
+          </DropdownMenuSubContent> */}
         </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
