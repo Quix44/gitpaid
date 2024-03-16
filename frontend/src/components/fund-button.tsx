@@ -70,7 +70,6 @@ export function FundButton({ repository, connected }: { repository: string, conn
         address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
         abi: GIT_PAID_ABI,
         functionName: 'fund',
-
         args: [paymentTokenAddress, repository, amountInWei],
         enabled: Boolean(isConnected && allowance && allowance >= amountInWei && paymentTokenAddress && repository),
     })
@@ -124,7 +123,10 @@ export function FundButton({ repository, connected }: { repository: string, conn
                             approvalWrite?.()
                             return
                         }
+
+
                         fundRepository?.()
+
                     }}>
 
                         {isApproving || isFundLoading ? <Loader2 className="animate-spin w-6 h-6" /> : allowance === 0n ? "Approve" : fundRepository ? "Fund" : "???"}

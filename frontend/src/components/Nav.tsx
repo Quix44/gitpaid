@@ -2,8 +2,8 @@
 
 import Provider from '@/app/(providers)/Wallet';
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import NavLinks from './NavLinks';
 
 function Nav() {
