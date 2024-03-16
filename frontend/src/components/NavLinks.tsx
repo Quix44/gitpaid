@@ -4,16 +4,17 @@ import { Button } from './ui/button'
 
 function NavLinks() {
     const { user, isAuthenticated } = useDynamicContext()
+    const githubUsername = user?.verifiedCredentials.find(g => g.oauthProvider === "github")?.oauthUsername
+
     return (
         <>
             {user ? (
                 <>
-                    <Button variant="link" asChild>
-                        <Link href="/repositories">
+                    {isAuthenticated ? <Button variant="link" asChild>
+                        <Link href={`/repositories/?username=${githubUsername}`}>
                             My Repositories
                         </Link>
-
-                    </Button>
+                    </Button> : null}
                     <Button variant="link" asChild>
                         <Link href="/issues">
                             Open Issues
