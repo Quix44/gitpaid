@@ -9,6 +9,8 @@ export const issueSchema = z.object({
   creator: z.string(),
   label: z.string(),
   status: z.string(),
+  avatar: z.string(),
+  url: z.string(),
 })
 
 export type Task = z.infer<typeof issueSchema>
