@@ -3,18 +3,18 @@ import {
   CrossCircledIcon
 } from "@radix-ui/react-icons"
 
-export const labels = [
+export const languages = [
   {
-    value: "bug",
-    label: "Bug",
+    value: "Python",
+    label: "Python",
   },
   {
-    value: "feature",
-    label: "Feature",
+    value: "Go",
+    label: "Go",
   },
   {
-    value: "documentation",
-    label: "Documentation",
+    value: "Solidity",
+    label: "Solidity",
   },
 ]
 

@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -27,6 +31,51 @@ const tableName = "gitpaid"
 type LambdaEvent struct {
 	Headers map[string]string
 	Event   string
+}
+
+type User struct {
+	ID             string `json:"id" dynamodbav:"id"`
+	GitHubUsername string `json:"githubUsername" dynamodbav:"githubUsername"`
+	Typename       string `json:"typename" dynamodbav:"typename"`
+	// Data           WalletLinkData `json:"metadata" dynamodbav:"metadata"`
+	CreatedAt time.Time         `json:"createdAt" dynamodbav:"createdAt"`
+	UpdatedAt time.Time         `json:"updatedAt" dynamodbav:"updatedAt"`
+	Metadata  map[string]string `json:"metadata" dynamodbav:"metadata"`
+}
+
+type WalletLinkData struct {
+	ID                string    `json:"id"`
+	Chain             string    `json:"chain"`
+	CreatedAt         time.Time `json:"createdAt"`
+	DeletedAt         any       `json:"deletedAt"`
+	HardwareWallet    any       `json:"hardwareWallet"`
+	LowerPublicKey    string    `json:"lowerPublicKey"`
+	Name              string    `json:"name"`
+	Provider          string    `json:"provider"`
+	PublicKey         string    `json:"publicKey"`
+	SignerWalletID    any       `json:"signerWalletId"`
+	TurnkeyHDWalletID string    `json:"turnkeyHDWalletId"`
+	UpdatedAt         time.Time `json:"updatedAt"`
+	UserID            string    `json:"userId"`
+}
+
+type GitHubCommit struct {
+	SHA    string `json:"sha"`
+	Commit struct {
+		Author struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+			Date  string `json:"date"`
+		} `json:"author"`
+		Committer struct {
+			Name  string `json:"name"`
+			Email string `json:"email"`
+			Date  string `json:"date"`
+		} `json:"committer"`
+		Message string `json:"message"`
+		// ... other fields as necessary
+	} `json:"commit"`
+	// ... other fields as necessary
 }
 
 type GithubZen struct {
@@ -230,12 +279,145 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 	}
 
 	switch event := eventObject.(type) {
-	case *github.PingEvent:
-		log.Printf("Received ping event: %+v\n", event)
-		// handlePingEvent(ctx, event.)
 	case *github.IssuesEvent:
-		log.Printf("Received issue event: %+v\n", event)
-		putIssuesEvent(ctx, event, r.Headers)
+		if *event.Action == "opened" || *event.Action == "closed" {
+			log.Printf("Issues Event: %+v\n", event)
+			putIssuesEvent(ctx, event, nil)
+			// issue closed, now go and find the PR for the issue using github api
+			if *event.Action == "closed" {
+				log.Printf("Issue closed")
+
+				/*
+					OBTAIN LABEL AND PULL REQUEST OBJECTS
+				*/
+				shouldPay, paymentLabel, pullRequest, err := shouldPayUser(event)
+				if err != nil {
+					log.Printf("Error checking if user should be paid: %s", err)
+					// return bad api response
+					return events.APIGatewayProxyResponse{
+						StatusCode: 500, // Internal Server Error
+						Headers: map[string]string{
+							"Content-Type": "application/json",
+						},
+						Body:            "{\"message\": \"Error checking if user should be paid\"}",
+						IsBase64Encoded: false,
+					}, nil
+				}
+				if shouldPay { // if the label is not null then we should pay the user, all the should pay checks have passed
+					// pay the user
+					log.Printf("User should be paid, label name is: %s", *paymentLabel.Name)
+
+					// 1. Get the users name, then get the users record from dynamo (User object)
+					// 2. Get the repo object to get the payment metadata (contract address etc)
+					// 3. Pay the user by calling the contract
+					/*
+						OBTAIN THE REPO AND USER OBJECTS
+					*/
+					keyCondition := expression.Key("typename").Equal(expression.Value("Repository"))
+					log.Printf("Repo name: %s", *pullRequest.Base.Repo.Name)
+					filter := expression.Name("data.name").Equal(expression.Value(*pullRequest.Base.Repo.Name))
+
+					expr, err := expression.NewBuilder().
+						WithKeyCondition(keyCondition).
+						WithFilter(filter).
+						Build()
+					if err != nil {
+						return events.APIGatewayProxyResponse{
+							StatusCode: 500, // Internal Server Error
+							Headers: map[string]string{
+								"Content-Type": "application/json",
+							},
+							Body:            "{\"message\": \"Error building query expression\"}",
+							IsBase64Encoded: false,
+						}, nil
+					}
+					// Prepare the query input
+					queryInput := dynamodb.QueryInput{
+						TableName:                 aws.String(tableName),
+						IndexName:                 aws.String("byTypename"),
+						KeyConditionExpression:    expr.KeyCondition(),
+						FilterExpression:          expr.Filter(),
+						ExpressionAttributeNames:  expr.Names(),
+						ExpressionAttributeValues: expr.Values(),
+					}
+					dynamoRepoItem, err := QueryDynamoDB[DynamoRepoItem](ctx, queryInput)
+					log.Printf("Dynamo Repo Item: %+v", dynamoRepoItem)
+					if err != nil || len(dynamoRepoItem) == 0 {
+						return events.APIGatewayProxyResponse{
+							StatusCode: 500, // Internal Server Error
+							Headers: map[string]string{
+								"Content-Type": "application/json",
+							},
+							Body:            "{\"message\": \"Error getting repository from dynamo\"}",
+							IsBase64Encoded: false,
+						}, nil
+					}
+					repo := dynamoRepoItem[0]
+					// repoMetadata := make(map[string]string)
+					log.Printf("Repo Metadata: %+v", repo.Metadata)
+					paymentAddress, addressErr := getPaymentAddress(ctx, *pullRequest.User.Login)
+					amount, err := parseAmount(paymentLabel.Name)
+					log.Printf("Payment Address: %s", paymentAddress)
+					log.Printf("Amount: %d", amount)
+					if err != nil || addressErr != nil {
+						log.Fatal(err)
+					}
+					if err != nil {
+						return events.APIGatewayProxyResponse{
+							StatusCode: 500, // Internal Server Error
+							Headers: map[string]string{
+								"Content-Type": "application/json",
+							},
+							Body:            "{\"message\": \"Error getting payment address\"}",
+							IsBase64Encoded: false,
+						}, nil
+					}
+
+					log.Printf("READY TO PAY USER ... INPUTS ARE")
+					log.Printf("Repo Metadata: %+v", repo.Metadata)
+					log.Printf("Payment Address: %s", paymentAddress)
+					log.Printf("Amount: %d", amount)
+					log.Printf("User Name: %s", *pullRequest.User.Login)
+					log.Printf("Finished")
+					payUser(ctx, repo.Metadata, paymentAddress, amount, repo.ID)
+				}
+			}
+		} else {
+			if *event.Action == "labeled" || *event.Action == "unlabeled" {
+				log.Printf("Running labeled or unlabeled event")
+				dynamoItem, err := getIssue(strconv.FormatInt(*event.Issue.ID, 10))
+				if err != nil {
+					log.Printf("Error getting issue: %s", err)
+					return events.APIGatewayProxyResponse{
+						StatusCode: 500, // Internal Server Error
+						Headers: map[string]string{
+							"Content-Type": "application/json",
+						},
+						Body:            "{\"message\": \"Error getting issue when trying to check labeled or unlabeled\"}",
+						IsBase64Encoded: false,
+					}, nil
+				}
+				if *dynamoItem.Data.Action == "opened" {
+					// issue is open, go and modify label metadata
+					log.Printf("Issue is open, modifying label metadata")
+					if *event.Action == "labeled" {
+						if dynamoItem.Metadata == nil {
+							dynamoItem.Metadata = make(map[string]string)
+						}
+						dynamoItem.Metadata["label"] = *event.Label.Name
+					} else {
+						for k := range dynamoItem.Metadata {
+							if k == "label" {
+								delete(dynamoItem.Metadata, k)
+							}
+						}
+					}
+				} else {
+					log.Printf("Issue is not open, not modifying label metadata")
+				}
+				putIssuesEvent(ctx, dynamoItem.Data, dynamoItem.Metadata)
+			}
+		}
 
 	case *github.LabelEvent:
 		log.Printf("Label Event: %+v\n", event)
@@ -253,6 +435,292 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 		Body:            "{\"message\": \"All Good!\"}",
 		IsBase64Encoded: false,
 	}, nil
+}
+
+func parseAmount(label *string) (int, error) {
+	if label == nil {
+		return 0, fmt.Errorf("label is nil")
+	}
+
+	// Split the string on the space
+	parts := strings.Split(*label, " ")
+
+	// Check if the split resulted in at least two parts
+	if len(parts) < 2 {
+		return 0, fmt.Errorf("expected at least two parts, got %d", len(parts))
+	}
+
+	// Parse the first part as an integer
+	amount, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse amount: %v", err)
+	}
+
+	return amount, nil
+}
+
+func getPaymentAddress(ctx context.Context, userName string) (string, error) {
+	keyCondition := expression.Key("typename").Equal(expression.Value("User"))
+	filter := expression.Name("githubUsername").Equal(expression.Value(userName))
+
+	expr, err := expression.NewBuilder().
+		WithKeyCondition(keyCondition).
+		WithFilter(filter).
+		Build()
+	if err != nil {
+		return "", fmt.Errorf("failed to build expression: %w", err)
+	}
+	// Prepare the query input
+	queryInput := dynamodb.QueryInput{
+		TableName:                 aws.String(tableName),
+		IndexName:                 aws.String("byTypename"),
+		KeyConditionExpression:    expr.KeyCondition(),
+		FilterExpression:          expr.Filter(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+	}
+	dynamoRepoItem, err := QueryDynamoDB[User](ctx, queryInput)
+	if len(dynamoRepoItem) == 0 || err != nil {
+		return "error obtaining wallet address for user to be paid", fmt.Errorf("failed to query DynamoDB: %w", err)
+	}
+
+	paymentAddress := &dynamoRepoItem[0]
+	log.Printf("Payment Address: %+v", paymentAddress)
+	if paymentAddress.Metadata == nil || paymentAddress.Metadata["publicKey"] == "" {
+		return "", fmt.Errorf("no payment address found")
+	}
+
+	return dynamoRepoItem[0].Metadata["publicKey"], nil
+}
+
+func shouldPayUser(event *github.IssuesEvent) (bool, *github.Label, *github.PullRequest, error) {
+	// ensure the issue has a valid payment label
+	paymentLabel, err := determinePaymentLabel(event)
+	if err != nil || paymentLabel == nil {
+		return false, nil, nil, fmt.Errorf("error determining payment label: %s", err)
+	}
+	// ensure the issue closing is the result of a merge request by inspecting commit messages
+	owner := *event.Repo.Owner.Login
+	repo := *event.Repo.Name
+	// Construct the URL with the variables
+	url := fmt.Sprintf("https://api.github.com/repos/%s/%s/commits", owner, repo)
+	headers := make(map[string]string)
+	headers["Authorization"] = fmt.Sprintf("Bearer %s", os.Getenv("GITHUB_ACCESS_TOKEN"))
+	commits, err := fetchData[[]GitHubCommit](url, headers)
+	// error fetching commits
+	if err != nil {
+		log.Printf("Error fetching data: %s", err)
+		return false, nil, nil, err
+	}
+	log.Printf("Commits: %+v", commits)
+	if len(commits) == 0 {
+		return false, nil, nil, fmt.Errorf("no commits found")
+	} else {
+		log.Printf("Commits: %+v", commits)
+		// look at the last commit message
+		lastCommit := commits[0]
+		log.Printf("Last commit: %+v", lastCommit)
+		// check if the last commit message contains the issue number
+		pullRequestNumber, issueSolvedNumber, err := extractNumbers(lastCommit.Commit.Message)
+
+		if err != nil {
+			fmt.Println("Error:", err)
+		} else {
+			fmt.Printf("Pull Request Number: %d\n", pullRequestNumber)
+			fmt.Printf("Issue Solved Number: %d\n", issueSolvedNumber)
+		}
+
+		// verify the pull request is actually merged and the issue is closed
+		// get the pull request
+		url = fmt.Sprintf("https://api.github.com/repos/%s/%s/pulls/%d", owner, repo, pullRequestNumber)
+		data, err := fetchData[github.PullRequest](url, headers)
+		if err != nil {
+			log.Printf("Error fetching data: %s", err)
+			return false, nil, nil, err
+		}
+		log.Printf("PR data: %+v", data)
+		if data.MergedAt == nil {
+			return false, nil, nil, fmt.Errorf("PR not merged")
+		}
+		// get the issue
+		url = fmt.Sprintf("https://api.github.com/repos/%s/%s/issues/%d", owner, repo, issueSolvedNumber)
+		issue, err := fetchData[github.Issue](url, headers)
+		if err != nil {
+			log.Printf("Error fetching data: %s", err)
+			return false, nil, nil, err
+		}
+		log.Printf("Issue data: %+v", issue)
+		if issue.State != nil && *issue.State == "closed" {
+			return true, paymentLabel, &data, nil
+		} else {
+			return false, nil, nil, fmt.Errorf("issue not closed")
+		}
+	}
+}
+
+func extractNumbers(commitMessage string) (pullRequestNumber int, issueSolvedNumber int, err error) {
+	// Regex to match "Merge pull request #<number>"
+	prRegex := regexp.MustCompile(`Merge pull request #(\d+)`)
+	prMatches := prRegex.FindStringSubmatch(commitMessage)
+
+	// Regex to match "fixes #<number>"
+	fixesRegex := regexp.MustCompile(`fixes #(\d+)`)
+	fixesMatches := fixesRegex.FindStringSubmatch(commitMessage)
+
+	// If matches found, convert captured strings to integers
+	if len(prMatches) > 1 {
+		pullRequestNumber, err = strconv.Atoi(prMatches[1])
+		if err != nil {
+			return 0, 0, fmt.Errorf("failed to convert pull request number to integer: %v", err)
+		}
+	} else {
+		err = fmt.Errorf("no pull request number found")
+		return
+	}
+
+	if len(fixesMatches) > 1 {
+		issueSolvedNumber, err = strconv.Atoi(fixesMatches[1])
+		if err != nil {
+			return 0, 0, fmt.Errorf("failed to convert issue solved number to integer: %v", err)
+		}
+	} else {
+		err = fmt.Errorf("no issue solved number found")
+		return
+	}
+
+	return pullRequestNumber, issueSolvedNumber, nil
+}
+
+func getValidLabelsForRepo(repo *string) ([]DynamoLabelEventItem, error) {
+	// query the dynamodb table for all the labels for the repo
+	// get the labels that are valid for the repo
+	// return the labels
+	keyCondition := expression.Key("typename").Equal(expression.Value("Label"))
+	filter := expression.Name("data.Repo.Name").Equal(expression.Value(repo)).And(expression.Name("data.Action").Equal(expression.Value("created")))
+
+	expr, err := expression.NewBuilder().
+		WithKeyCondition(keyCondition).
+		WithFilter(filter).
+		Build()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build expression: %w", err)
+	}
+	// Prepare the query input
+	queryInput := dynamodb.QueryInput{
+		TableName:                 aws.String(tableName),
+		IndexName:                 aws.String("byTypename"),
+		KeyConditionExpression:    expr.KeyCondition(),
+		FilterExpression:          expr.Filter(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+	}
+	ctx := context.TODO()
+	items, err := QueryDynamoDB[DynamoLabelEventItem](ctx, queryInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query DynamoDB: %w", err)
+	}
+	return items, nil
+}
+
+func determinePaymentLabel(event *github.IssuesEvent) (*github.Label, error) {
+	verifiedLabels, err := getValidLabelsForRepo(event.Repo.Name)
+	if err != nil {
+		return nil, fmt.Errorf("error getting valid labels for repo: %w", err)
+	}
+	// iterate through the labels on the event
+
+	for _, eventLabel := range event.Issue.Labels {
+		log.Printf("Checking label: %s", *eventLabel.Name)
+		for _, verifiedLabel := range verifiedLabels {
+			log.Printf("Checking verified label: %s", *verifiedLabel.Data.Label.Name)
+			// found a verified label, return it
+			_, correctValue := findMatchingString(eventLabel.Name)
+			log.Printf("Correct value: %t", correctValue)
+			log.Printf("Verified label: %+v", verifiedLabel)
+			log.Printf("Event label: %+v", eventLabel)
+			if *verifiedLabel.Data.Label.Name == *eventLabel.Name && correctValue {
+				return &eventLabel, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("no verified label found")
+}
+
+func findMatchingString(input *string) (string, bool) {
+	// Create a regex pattern
+	pattern := regexp.MustCompile(`^\d+\s[a-zA-Z]{1,5}$`)
+
+	// Find a match
+	match := pattern.FindString(*input)
+
+	// If match is found, return it along with true; otherwise return an empty string with false
+	return match, match != ""
+}
+
+func fetchData[T any](url string, headers map[string]string) (T, error) {
+	var result T // Initialize a variable of type T
+
+	// Create a new HTTP GET request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return result, err
+	}
+
+	// Set headers for the request
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	// Send the request
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return result, err
+	}
+
+	// Unmarshal the response body into the result
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+func getIssue(ID string) (DynamoIssuesEventItem, error) {
+	keyCondition := expression.Key("typename").Equal(expression.Value("Issue"))
+	filter := expression.Name("id").Equal(expression.Value(ID))
+
+	expr, err := expression.NewBuilder().
+		WithKeyCondition(keyCondition).
+		WithFilter(filter).
+		Build()
+	if err != nil {
+		return DynamoIssuesEventItem{}, fmt.Errorf("failed to build expression: %w", err)
+	}
+	// Prepare the query input
+	queryInput := dynamodb.QueryInput{
+		TableName:                 aws.String(tableName),
+		IndexName:                 aws.String("byTypename"),
+		KeyConditionExpression:    expr.KeyCondition(),
+		FilterExpression:          expr.Filter(),
+		ExpressionAttributeNames:  expr.Names(),
+		ExpressionAttributeValues: expr.Values(),
+	}
+	ctx := context.TODO()
+	items, err := QueryDynamoDB[DynamoIssuesEventItem](ctx, queryInput)
+	if err != nil {
+		return DynamoIssuesEventItem{}, fmt.Errorf("failed to query DynamoDB: %w", err)
+	}
+	// issue := items[0].Data.(*github.IssuesEvent)
+	return items[0], nil
 }
 
 func putLabelEvent(ctx context.Context, event *github.LabelEvent) {
@@ -340,9 +808,7 @@ func handlePingEvent(ctx context.Context, repoName string) (string, error) {
 		return "error", fmt.Errorf("failed to query DynamoDB: %w", err)
 	}
 	_repo := repo[0]
-	if _repo.Metadata == nil {
-		_repo.Metadata = make(map[string]string)
-	}
+
 	_repo.Metadata["active"] = "true"
 	PutItemInDynamoDB(ctx, _repo)
 

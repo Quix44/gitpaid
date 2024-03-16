@@ -44,18 +44,6 @@ func Init() {
 	svc = dynamodb.NewFromConfig(cfg)
 }
 
-// type LambdaInput struct {
-// 	Event                 any    `json:"event"`
-// 	Network               any    `json:"network"`
-// 	ListenerId            any    `json:"listenerId"`
-// 	Abi                   any    `json:"abi"`
-// 	Api                   any    `json:"api"`
-// 	Args                  any    `json:"args"`
-// 	Headers               any    `json:"headers"`
-// 	Method                string `json:"method"`
-// 	QueryStringParameters any    `json:"queryStringParameters"`
-// }
-
 func init() {
 	Init()
 }
@@ -86,32 +74,10 @@ type EventStruct struct {
 }
 
 func HandleRequest(ctx context.Context, r LambdaEvent) {
-
-	// var eventMap UnpackedEvent
-	// if err := json.Unmarshal(payload, &eventMap); err != nil {
-	// 	log.Fatalf("Failed to unmarshal Event string: %s", err)
-	// }
-
-	// print out the object
-	// fmt.Println("Lambda Input: ", lambdaInput)
-	// args := json.Unmarshal(lambdaInput.Event, &EventStruct{})
-	// logAsJSON(args)
 	tokenAddress := r.Event.Args[0]
 	repository := r.Event.Args[1]
 	payeeAddress := r.Event.Args[2]
 	amount := r.Event.Args[3]
-
-	// fmt.Println("Token Address: ", tokenAddress)
-	// fmt.Println("Repository: ", repository)
-	// fmt.Println("Payee Address: ", payeeAddress)
-	// fmt.Println("Amount: ", amount)
-
-	// // convert amount into a uint64
-	// amountUint64, err := strconv.ParseUint(amount, 10, 64)
-	// if err != nil {
-	// 	fmt.Println("Error converting amount to uint64: ", err)
-	// 	return
-	// }
 
 	keyCond := expression.KeyEqual(expression.Key("typename"), expression.Value("Repository"))
 	filter := expression.Name("id").Equal(expression.Value(repository))
@@ -150,6 +116,7 @@ func HandleRequest(ctx context.Context, r LambdaEvent) {
 	newMap := TokenMetadata{
 		"421614",
 		"https://arb-sepolia.g.alchemy.com/v2/Z8Y0CZXvhPgiTt8akdr4Z_dS03C2-H0X",
+		"0x7c947431F243ab9679a8d0349d836FB34d5d01F5",
 		tokenAddress,
 		payeeAddress,
 		amount,
@@ -159,14 +126,6 @@ func HandleRequest(ctx context.Context, r LambdaEvent) {
 		fmt.Println("Error marshalling map: ", err)
 		return
 	}
-
-	// newMap := map[string]types.AttributeValue{
-	// 	"payeeAddress": &types.AttributeValueMemberS{Value: payeeAddress},
-	// 	"amount":       &types.AttributeValueMemberS{Value: amount},
-	// 	"tokenAddress": &types.AttributeValueMemberS{Value: tokenAddress},
-	// 	"chainID":      &types.AttributeValueMemberS{Value: "421614"},
-	// 	"rpc":          &types.AttributeValueMemberS{Value: "https://arb-sepolia.g.alchemy.com/v2/Z8Y0CZXvhPgiTt8akdr4Z_dS03C2-H0X"},
-	// }
 
 	updates := map[string]types.AttributeValue{
 		"updatedAt": &types.AttributeValueMemberS{Value: time.Now().Format(time.RFC3339)},
@@ -215,11 +174,12 @@ func UpdateItem(ctx context.Context, tableName, id string, updates map[string]ty
 }
 
 type TokenMetadata struct {
-	ChainID      string `json:"chainID" dynamodbav:"chainID"`
-	RPC          string `json:"rpc" dynamodbav:"rpc"`
-	TokenAddress string `json:"tokenAddress" dynamodbav:"tokenAddress"`
-	PayeeAddress string `json:"payeeAddress" dynamodbav:"payeeAddress"`
-	Amount       string `json:"amount" dynamodbav:"amount"`
+	ChainID         string `json:"chainID" dynamodbav:"chainID"`
+	RPC             string `json:"rpc" dynamodbav:"rpc"`
+	ContractAddress string `json:"contractAddress" dynamodbav:"contractAddress"`
+	TokenAddress    string `json:"tokenAddress" dynamodbav:"tokenAddress"`
+	PayeeAddress    string `json:"payeeAddress" dynamodbav:"payeeAddress"`
+	Amount          string `json:"amount" dynamodbav:"amount"`
 }
 
 func QueryDynamoDB[T any](ctx context.Context, queryInput dynamodb.QueryInput) ([]T, error) {

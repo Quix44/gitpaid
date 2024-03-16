@@ -3,43 +3,21 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 
+import Image from "next/image"
 import { statuses } from "../data/data"
 import { Task } from "../data/schema"
+import { Badge } from "../ui/badge"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
 export const columns: ColumnDef<Task>[] = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //       className="translate-y-[2px]"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //       className="translate-y-[2px]"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
   {
     accessorKey: "id",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Task" />
     ),
     cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
-    enableSorting: false,
+    enableSorting: true,
     enableHiding: false,
   },
   {
@@ -48,15 +26,12 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Repository" />
     ),
     cell: ({ row }) => {
-      // const label = labels.find((label) => label.value === row.original.label)
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px] truncate font-medium cursor-pointer hover:text-primary" onClick={() => { window.open(row.original.url, '_blank', 'noreferrer') }}>
             {row.getValue("repository")}
           </span>
-        </div>
+        </div >
       )
     },
   },
@@ -66,11 +41,8 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Description" />
     ),
     cell: ({ row }) => {
-      // const label = labels.find((label) => label.value === row.original.label)
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[500px] truncate font-medium">
             {row.getValue("description")}
           </span>
@@ -84,13 +56,11 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Creator" />
     ),
     cell: ({ row }) => {
-      // const label = labels.find((label) => label.value === row.original.label)
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("creator")}
+          <span className="max-w-[500px] truncate font-medium flex">
+            {row.original.avatar && <Image src={row.original.avatar} className="rounded-full" alt={row.original.creator} width={34} height={34} />}
+            {<p className="mt-2 ml-1">{row.getValue("creator")}</p>}
           </span>
         </div>
       )
@@ -102,13 +72,25 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Label" />
     ),
     cell: ({ row }) => {
-      // const label = labels.find((label) => label.value === row.original.label)
-
       return (
         <div className="flex space-x-2">
-          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("label")}
+            {row.original.label && <Badge variant="outline">{row.original.label}</Badge>}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "language",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Language" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.original.language && <Badge variant="outline">{row.original.language}</Badge>}
           </span>
         </div>
       )

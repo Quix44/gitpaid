@@ -15,20 +15,21 @@ export const metadata: Metadata = {
 async function getIssues() {
     const apiKey = process.env.EMITLY_API_KEY as string
     const url = `https://api.emitly.dev/v1/webhook?listenerId=fn_231fbbe718228828ed3f1d56d88b24e9&apikey=${apiKey}&issues=true`
-    const response = await fetch(url, { method: 'POST' })
+    const response = await fetch(url, { method: 'POST', cache: 'no-cache' })
 
     const jsonData = await response.json()
-    const _data: DataResponse[] = jsonData.body.map((y: { Data: any }) => y)
     const outputIssues = []
     for (const issue of jsonData.body as DataResponse[]) {
-        console.log(issue)
         outputIssues.push({
             id: issue.Data.Issue.Number,
             repository: issue.Data.Repo.Name,
             description: issue.Data.Issue.Title,
             creator: issue.Data.Sender.Login,
-            label: issue.Metadata?.label || "No Label",
-            status: issue.Data.Issue.State
+            url: issue.Data.Issue.HTMLURL,
+            avatar: issue.Data.Sender.AvatarURL,
+            label: issue.Metadata?.label || issue.Data.Issue.Labels.find(label => label)?.Name || "NA",
+            status: issue.Data.Issue.State,
+            language: issue.Data.Repo.Language || "NA",
         })
     }
 
