@@ -1,7 +1,10 @@
+"use client"
+
+import Provider from '@/app/(providers)/Wallet';
 import { Button } from '@/components/ui/button';
+import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 
 import Image from 'next/image';
-import Provider from '../app/(providers)/Wallet';
 
 function Nav() {
     return (
@@ -10,7 +13,9 @@ function Nav() {
             <div className="flex space-between items-center">
                 <Button variant="link">Git Started</Button>
                 <Button variant="link">Git Help</Button>
-                <Provider />
+                <Provider>
+                    <DynamicWidget />
+                </Provider>
             </div>
         </nav>
     )

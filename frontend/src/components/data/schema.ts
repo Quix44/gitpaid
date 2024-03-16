@@ -11,4 +11,16 @@ export const issueSchema = z.object({
   status: z.string(),
 })
 
-export type Task = z.infer<typeof issueSchema>
+export const repoSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  connected: z.boolean(),
+  creator: z.string(),
+  description: z.string().optional(),
+  amount: z.string().optional(),
+  label: z.union([z.string(), z.undefined(), z.null()]),
+  status: z.string().optional(),
+})
+
+export type IssueTask = z.infer<typeof issueSchema>
+export type RepositoryTask = z.infer<typeof repoSchema>
