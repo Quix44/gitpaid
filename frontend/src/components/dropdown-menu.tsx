@@ -15,7 +15,7 @@ import {
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
-export function DropdownMenuTokens({ setter }: any) {
+export function DropdownMenuTokens() {
     const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
     const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
     const [showPanel, setShowPanel] = React.useState<Checked>(false)
@@ -23,7 +23,7 @@ export function DropdownMenuTokens({ setter }: any) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline">Open</Button>
+                <Button variant="outline">Select ERC20</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" >
                 <DropdownMenuLabel>Select Token</DropdownMenuLabel>
