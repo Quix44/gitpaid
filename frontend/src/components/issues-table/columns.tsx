@@ -112,35 +112,37 @@ export const columns: ColumnDef<IssueTask>[] = [
         (status) => status.value === row.getValue("status")
       )
 
+
+
+
+      const isStatusPresent = Boolean(status); // Determines if status is present
+      const textColorClass = isStatusPresent ? 'text-green-500' : 'text-red-500'; // Choose color based on status presence
+
       if (!status) {
         return null
       }
-      const textColorClass = status ? 'text-green-500' : 'text-red-500';
 
       return (
         <div className="flex w-[100px] items-center">
-          {status && status.icon && (
+          {isStatusPresent && status.icon && (
             <status.icon className={`mr-2 h-4 w-4 ${textColorClass}`} />
           )}
-          {!status ? (
-            // When there's no status, wrap the "No Status" text in a Tooltip
+          {isStatusPresent ? (
+            // If status is present, display its label with the appropriate text color
+            <span className={textColorClass}>{status.label}</span>
+          ) : (
+            // If status is not present, show "No Status" with a tooltip in red
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>Hover</TooltipTrigger>
-                <TooltipContent>
-                  <h4 className="font-medium leading-none">This issue was closed By: Name</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Amount paid:<b>money</b>
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    link
-                  </p>
+                <TooltipTrigger asChild>
+                  <span className="text-red-500">No Status</span>
+                </TooltipTrigger>
+                <TooltipContent className="bg-card">
+                  <h4 className="font-medium leading-none">Status Unavailable</h4>
+                  {/* You can add more context or remove these placeholders as needed */}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          ) : (
-            // Render status label with appropriate text color when status exists
-            <span className={textColorClass}>{status.label}</span>
           )}
         </div>
       )
