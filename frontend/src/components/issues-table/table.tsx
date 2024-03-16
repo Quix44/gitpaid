@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     description: "Gitpaid Issues Dashboard.",
 }
 
-// Simulate a database read for tasks.
 async function getIssues() {
     const apiKey = process.env.EMITLY_API_KEY as string
     const url = `https://api.emitly.dev/v1/webhook?listenerId=fn_231fbbe718228828ed3f1d56d88b24e9&apikey=${apiKey}&issues=true`
     const response = await fetch(url, { method: 'POST', cache: 'no-cache' })
 
     const jsonData = await response.json()
+    console.log(jsonData.statusCode)
     const outputIssues = []
     for (const issue of jsonData.body as DataResponse[]) {
         outputIssues.push({
