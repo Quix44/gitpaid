@@ -140,13 +140,17 @@ export const columns: ColumnDef<IssueTask>[] = [
                     amount: <b>{row.original.amount}</b>
                   </p>
                   <p className="text-sm text-muted-foreground line-clamp-2 max-w[60px] text-ellipsis ">
-                    resolved by: <b>{row.original.transactionId}</b>
+                    resolved by: <b>{row.original.solverUsername}</b>
+                  </p>
+                  <p className="text-sm text-muted-foreground line-clamp-2 max-w[60px] text-ellipsis ">
+                    TxID: <b><a href={"https://sepolia.arbiscan.io/tx/" + row.original.transactionId}>{row.original.transactionId}</a></b>
                   </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
-        </div>
+          )
+          }
+        </div >
       )
     },
     filterFn: (row, id, value) => {
