@@ -70,7 +70,6 @@ export function FundButton({ repository, connected }: { repository: string, conn
         address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
         abi: GIT_PAID_ABI,
         functionName: 'fund',
-
         args: [paymentTokenAddress, repository, amountInWei],
         enabled: Boolean(isConnected && allowance && allowance >= amountInWei && paymentTokenAddress && repository),
     })
@@ -109,7 +108,15 @@ export function FundButton({ repository, connected }: { repository: string, conn
                         </Label>
                         <Input onChange={(e) => setAmount(Number(e.target.value))} type="number" placeholder="Amount" id="link" />
                     </div>
-                    <Button variant={'secondary'} size="sm" className="px-3" onClick={async (e) => {
+
+                </div>
+                <DialogFooter className="sm:justify-start">
+                    <DialogClose asChild>
+                        <Button type="button" variant="ghost">
+                            Close
+                        </Button>
+                    </DialogClose>
+                    <Button variant={'secondary'} onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         if (allowance === 0n) {
@@ -119,19 +126,11 @@ export function FundButton({ repository, connected }: { repository: string, conn
 
 
                         fundRepository?.()
-                        await new Promise((resolve) => setTimeout(resolve, 6000))
-                        // sleep 
+
                     }}>
 
                         {isApproving || isFundLoading ? <Loader2 className="animate-spin w-6 h-6" /> : allowance === 0n ? "Approve" : fundRepository ? "Fund" : "???"}
                     </Button>
-                </div>
-                <DialogFooter className="sm:justify-start">
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                            Close
-                        </Button>
-                    </DialogClose>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

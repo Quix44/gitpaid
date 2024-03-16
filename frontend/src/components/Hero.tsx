@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 function Hero() {
     return (
-        <section className="grid grid-cols-12 bg-primary  items-center rounded-lg">
+        <section className="grid grid-cols-12 bg-primary  items-center rounded-3xl">
             <div className="col-span-5">
                 <Image
                     src="/Octocatlogo.png"

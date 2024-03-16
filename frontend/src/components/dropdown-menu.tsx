@@ -1,53 +1,40 @@
 "use client"
 
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
-import * as React from "react"
+import * as React from "react";
 
-import { Button } from "@/components/ui/button"
 import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
-type Checked = DropdownMenuCheckboxItemProps["checked"]
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export function DropdownMenuTokens() {
-    const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
-    const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
-    const [showPanel, setShowPanel] = React.useState<Checked>(false)
+    const [selectedToken, setSelectedToken] = React.useState<string | undefined>(undefined);
+
+    const handleSelectChange = (value: string) => {
+        setSelectedToken(value);
+        // Implement any additional logic you need when a new token is selected.
+        // For example, update other components or states based on the selected token.
+    };
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline">Select ERC20</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" >
-                <DropdownMenuLabel>Select Token</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                    checked={showStatusBar}
-                    onCheckedChange={setShowStatusBar}
-                >
-                    USDC
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                    checked={showActivityBar}
-                    onCheckedChange={setShowActivityBar}
-                    disabled
-                >
-                    Ape Coin
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                    checked={showPanel}
-                    onCheckedChange={setShowPanel}
-                >
-                    Arb Token
-                </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
+        <Select onValueChange={handleSelectChange}>
+            <SelectTrigger className="w-[280px]">
+                <SelectValue placeholder="Select ERC20" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectGroup>
+                    <SelectLabel>ERC20 Token</SelectLabel>
+                    <SelectItem value="usdc">USDC</SelectItem>
+
+                    <SelectItem value="ape" >Ape Coin</SelectItem>
+                    <SelectItem value="arb">Arb Token</SelectItem>
+                </SelectGroup>
+            </SelectContent>
+        </Select>
+    );
 }
