@@ -1,5 +1,6 @@
 "use client"
 
+import Provider from "@/app/(providers)/Wallet"
 import { ColumnDef } from "@tanstack/react-table"
 import ConnectRepositoryButton from "../ConnectRepositoryButton"
 import { RepositoryTask } from "../data/schema"
