@@ -45,6 +45,7 @@ const Provider = ({ children }: any) => {
         <DynamicContextProvider
             settings={{
                 evmNetworks,
+                appName: 'Gitpaid',
                 onboardingImageUrl: 'https://i.imgur.com/3g7nmJC.png',
                 eventsCallbacks: {
                     onAuthFlowClose: () => {
