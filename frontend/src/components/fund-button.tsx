@@ -66,7 +66,6 @@ export function FundButton({ repository }: { repository: string }) {
     });
 
 
-
     const { config, data: isAbleToFund } = usePrepareContractWrite({
         address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
         abi: GIT_PAID_ABI,
@@ -88,7 +87,6 @@ export function FundButton({ repository }: { repository: string }) {
             })
         }
     })
-    console.log(fundRepository, isAbleToFund)
 
     return (
         <Dialog>
