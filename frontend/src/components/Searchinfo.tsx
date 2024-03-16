@@ -20,7 +20,7 @@ function Searchinfo() {
                             Lets log in
                         </div>
                         <p className="leading-7 [&:not(:first-child)]:mt-0">
-                            Simply login with your github profile to get started
+                            Simply login with your Github account to get started
                         </p>
                     </div>
 
@@ -34,7 +34,7 @@ function Searchinfo() {
                             Search and commit
                         </div>
                         <p className="leading-7 [&:not(:first-child)]:mt-0">
-                            You can search through our global issue repo based on price, skill and type.
+                            Search through our aggregated set of incentivized issues based on price, language and type.
                         </p>
                     </div>
 
@@ -48,7 +48,7 @@ function Searchinfo() {
                             Search and commit
                         </div>
                         <p className="leading-7 [&:not(:first-child)]:mt-0">
-                            Submit a PR to your chosen issue, if the PR is accepted, you’ll be getting those juicy dollar bills in your wallet.
+                            Submit a PR to any issue, if the PR is accepted, you will instantly receive the ERC20 token defined in the issue label.
                         </p>
                     </div>
                 </div>

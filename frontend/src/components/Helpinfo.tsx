@@ -16,7 +16,7 @@ function Helpinfo() {
                             Lets log in
                         </div>
                         <p className="leading-7 [&:not(:first-child)]:mt-0">
-                            Simply login with your github profile to get started
+                            Simply login with your Github account to get started
                         </p>
                     </div>
 
