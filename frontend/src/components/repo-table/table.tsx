@@ -19,8 +19,7 @@ async function getRepos(username: string | null) {
     const jsonData = await response.json()
 
     const outputRepositories = []
-    for (const repo of jsonData.body as DataResponse[]) {
-        console.log(repo.Data.description)
+    for (const repo of jsonData.body) {
         outputRepositories.push({
             id: repo.Data.id,
             name: repo.Data.name,
