@@ -1,5 +1,4 @@
 import Table from "@/components/repo-table/table";
-import { useRouter } from 'next/router';
 import ImportRepo from "../../components/ImportRepo";
 
 function Page({
@@ -9,7 +8,7 @@ function Page({
     params: { slug: string };
     searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-    const router = useRouter();
+
     return (
         <main className="p-24">
             <div className="flex items-center justify-between space-y-2">
