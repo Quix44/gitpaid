@@ -28,6 +28,7 @@ async function getRepos(username: string | null) {
             creator: repo.Data.owner.login,
             label: repo.Data.language,
             amount: repo.Metadata?.amount ?? "",
+            url: repo.Data.html_url ?? ""
         })
     }
 
