@@ -23,7 +23,7 @@ interface ConnectRepositoryButtonProps {
 
 export function ConnectRepositoryButton({ connected }: ConnectRepositoryButtonProps) {
     const buttonText = connected ? "Connected" : "Connect";
-    const endpointURL = "https://api.emitly.dev/v1/webhook?listenerId=fn_d4ed02609e29c9826eaad0744cbf0e56&apikey=tsxKKZgpDx7CM3yQq3pUYvXH4yp3oCe7KxaZtmqi"
+    const endpointURL = "https://api.emitly.dev/v1/webhook?listenerId=fn_258e7692473366ae283dac5e9fe09d00&apikey=tsxKKZgpDx7CM3yQq3pUYvXH4yp3oCe7KxaZtmqi"
 
     const handleCopy = async () => {
         try {

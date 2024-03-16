@@ -4,24 +4,17 @@ import { Button } from './ui/button';
 
 function NavLinks() {
     const { user, isAuthenticated } = useDynamicContext()
-
-    // Find the credential with an oauthUsername
-    const oauthCredential = user?.verifiedCredentials.find(credential => credential.oauthUsername);
-
-    // Extract the oauthUsername, if available
-    const oauthUsername = oauthCredential ? oauthCredential.oauthUsername : null;
-
+    const githubUsername = user?.verifiedCredentials.find(g => g.oauthProvider === "github")?.oauthUsername
 
     return (
         <>
             {user ? (
                 <>
-                    <Button variant="link" asChild>
-                        <Link href={`/repository/${oauthUsername}`}>
+                    {isAuthenticated ? <Button variant="link" asChild>
+                        <Link href={`/repositories/?username=${githubUsername}`}>
                             My Repositories
                         </Link>
-
-                    </Button>
+                    </Button> : null}
                     <Button variant="link" asChild>
                         <Link href="/issues">
                             Open Issues

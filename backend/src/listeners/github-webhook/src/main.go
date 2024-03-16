@@ -33,6 +33,19 @@ type LambdaEvent struct {
 	Event   string
 }
 
+type PaymentInfo struct {
+	// closer name
+	SolverUsername string `json:"solverUsername" dynamodbav:"solverUsername"`
+	// closer avatar
+	SolverAvatar string `json:"solverAvatar" dynamodbav:"solverAvatar"`
+	// amount paid
+	Amount int `json:"amount" dynamodbav:"amount"`
+	// issue id - link to issues on frontend
+	IssueID string `json:"issueID" dynamodbav:"issueID"`
+	// tx id
+	TxID string `json:"txID" dynamodbav:"txID"`
+}
+
 type User struct {
 	ID             string `json:"id" dynamodbav:"id"`
 	GitHubUsername string `json:"githubUsername" dynamodbav:"githubUsername"`
@@ -379,7 +392,49 @@ func HandleRequest(ctx context.Context, r LambdaEvent) (events.APIGatewayProxyRe
 					log.Printf("Amount: %d", amount)
 					log.Printf("User Name: %s", *pullRequest.User.Login)
 					log.Printf("Finished")
-					payUser(ctx, repo.Metadata, paymentAddress, amount, repo.ID)
+					txHash, err := payUser(ctx, repo.Metadata, paymentAddress, amount, repo.ID)
+					if err != nil {
+						log.Printf("Error paying user: %s", err)
+						return events.APIGatewayProxyResponse{
+							StatusCode: 500, // Internal Server Error
+							Headers: map[string]string{
+								"Content-Type": "application/json",
+							},
+							Body:            "{\"message\": \"Error paying user\"}",
+							IsBase64Encoded: false,
+						}, nil
+					}
+					log.Printf("Transaction Hash: %s", txHash)
+					issueID := strconv.FormatInt(*event.Issue.ID, 10)
+					paymentInfo := PaymentInfo{
+						SolverUsername: *pullRequest.User.Login,
+						SolverAvatar:   *pullRequest.User.AvatarURL,
+						Amount:         amount,
+						IssueID:        issueID,
+						TxID:           txHash,
+					}
+
+					issue, err := getIssue(issueID)
+					if err != nil {
+						log.Printf("Error getting issue: %s", err)
+						return events.APIGatewayProxyResponse{
+							StatusCode: 500, // Internal Server Error
+							Headers: map[string]string{
+								"Content-Type": "application/json",
+							},
+							Body:            "{\"message\": \"Error getting issue\"}",
+							IsBase64Encoded: false,
+						}, nil
+					}
+					if issue.Metadata == nil {
+						issue.Metadata = make(map[string]string)
+					}
+
+					issue.Metadata["solverUsername"] = paymentInfo.SolverUsername
+					issue.Metadata["solverAvatar"] = paymentInfo.SolverAvatar
+					issue.Metadata["amount"] = strconv.Itoa(paymentInfo.Amount)
+					issue.Metadata["txID"] = paymentInfo.TxID
+					putIssuesEvent(ctx, issue.Data, issue.Metadata)
 				}
 			}
 		} else {
@@ -808,6 +863,10 @@ func handlePingEvent(ctx context.Context, repoName string) (string, error) {
 		return "error", fmt.Errorf("failed to query DynamoDB: %w", err)
 	}
 	_repo := repo[0]
+
+	if _repo.Metadata == nil {
+		_repo.Metadata = make(map[string]string)
+	}
 
 	_repo.Metadata["active"] = "true"
 	PutItemInDynamoDB(ctx, _repo)

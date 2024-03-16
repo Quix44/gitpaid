@@ -14,7 +14,7 @@ async function getRepos(username: string | null) {
     if (!username) return []
     const apiKey = process.env.EMITLY_API_KEY as string
     const url = `https://api.emitly.dev/v1/webhook?listenerId=fn_231fbbe718228828ed3f1d56d88b24e9&apikey=${apiKey}&repos=true&user=${username}`
-    const response = await fetch(url, { method: 'POST' })
+    const response = await fetch(url, { method: 'POST', cache: 'no-cache' })
     const jsonData = await response.json()
 
     const outputRepositories = []
