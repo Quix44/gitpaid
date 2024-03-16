@@ -70,8 +70,9 @@ export function FundButton({ repository, connected }: { repository: string, conn
         address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`,
         abi: GIT_PAID_ABI,
         functionName: 'fund',
+
         args: [paymentTokenAddress, repository, amountInWei],
-        enabled: Boolean(isConnected && allowance && allowance >= amountInWei && paymentTokenAddress && repository && amountInWei),
+        enabled: Boolean(isConnected && allowance && allowance >= amountInWei && paymentTokenAddress && repository),
     })
 
     const { write: fundRepository, data: fundRepoData } = useContractWrite(config)
@@ -110,6 +111,7 @@ export function FundButton({ repository, connected }: { repository: string, conn
                     </div>
                     <Button variant={'secondary'} size="sm" className="px-3" onClick={(e) => {
                         e.preventDefault()
+                        e.stopPropagation()
                         if (allowance === 0n) {
                             approvalWrite?.()
                             return
