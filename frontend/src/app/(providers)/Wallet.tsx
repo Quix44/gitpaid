@@ -10,6 +10,8 @@ const Provider = ({ children }: any) => {
     return (
         <DynamicContextProvider
             settings={{
+
+
                 onboardingImageUrl: 'https://i.imgur.com/3g7nmJC.png',
                 eventsCallbacks: {
                     onAuthFlowClose: () => {
