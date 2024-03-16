@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 
 import Image from 'next/image';
-import Provider from '../(providers)/Wallet';
+import Provider from '../app/(providers)/Wallet';
 
 function Nav() {
     return (

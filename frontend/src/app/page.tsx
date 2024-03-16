@@ -1,5 +1,5 @@
-import Hero from "./components/Hero";
-import Statrow from "./components/Statrow";
+import Hero from "../components/Hero";
+import Statrow from "../components/Statrow";
 
 export default function Home() {
   return (
