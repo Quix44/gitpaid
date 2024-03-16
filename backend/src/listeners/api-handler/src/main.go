@@ -200,11 +200,11 @@ func handleListLabelsRequest(request events.APIGatewayV2HTTPRequest) (events.API
 func handleListIssuesRequest(request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
 	// targetUser := request.QueryStringParameters["user"]
 	keyCondition := expression.Key("typename").Equal(expression.Value("Issue"))
-	filter := expression.Name("data.Action").NotEqual(expression.Value("closed"))
+	// filter := expression.Name("data.Action").NotEqual(expression.Value("closed"))
 
 	expr, err := expression.NewBuilder().
 		WithKeyCondition(keyCondition).
-		WithFilter(filter).
+		// WithFilter(filter).
 		Build()
 
 	if err != nil {
@@ -217,10 +217,10 @@ func handleListIssuesRequest(request events.APIGatewayV2HTTPRequest) (events.API
 
 	// Prepare the query input
 	queryInput := dynamodb.QueryInput{
-		TableName:                 aws.String("gitpaid"),
-		IndexName:                 aws.String("byTypename"),
-		KeyConditionExpression:    expr.KeyCondition(),
-		FilterExpression:          expr.Filter(),
+		TableName:              aws.String("gitpaid"),
+		IndexName:              aws.String("byTypename"),
+		KeyConditionExpression: expr.KeyCondition(),
+		// FilterExpression:          expr.Filter(),
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
 	}

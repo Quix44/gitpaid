@@ -19,9 +19,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-[#040D26] ${inter.className}`}>
+      <body suppressHydrationWarning={true} className={`bg-[#040D26] ${inter.className}`}>
         <Nav />
-
         {children}
         <Footer />
       </body>

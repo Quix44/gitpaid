@@ -56,7 +56,6 @@ const Provider = ({ children }: any) => {
                     onAuthSuccess: (e: any) => {
                         // Set the github username in the url
                         const githubUsername = e.user.verifiedCredentials.find((g: { oauthProvider: string; }) => g.oauthProvider === "github")?.oauthUsername
-                        console.log(githubUsername)
                         return router.push(`/repositories?username=${githubUsername}`)
                     },
                     onLogout: () => {

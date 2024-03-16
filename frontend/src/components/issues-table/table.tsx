@@ -17,17 +17,20 @@ async function getIssues() {
     const response = await fetch(url, { method: 'POST', cache: 'no-cache' })
 
     const jsonData = await response.json()
-    console.log(jsonData.statusCode)
     const outputIssues = []
-    for (const issue of jsonData.body as DataResponse[]) {
+    for (const issue of jsonData.body) {
         outputIssues.push({
             id: issue.Data.Issue.Number,
             repository: issue.Data.Repo.Name,
+            solverAvatar: issue.Metadata?.solverAvatar || issue.Data.Sender.AvatarURL,
+            solverUsername: issue.Data.Sender.Login,
+            transactionId: issue.Metadata?.txID || "NA",
             description: issue.Data.Issue.Title,
+            amount: issue.Metadata?.amount || "NA",
             creator: issue.Data.Sender.Login,
             url: issue.Data.Issue.HTMLURL,
             avatar: issue.Data.Sender.AvatarURL,
-            label: issue.Metadata?.label || issue.Data.Issue.Labels.find(label => label)?.Name || "NA",
+            label: issue.Metadata?.label || issue.Data.Issue.Labels.find((label: any) => label)?.Name || "NA",
             status: issue.Data.Issue.State,
             language: issue.Data.Repo.Language || "NA",
         })
@@ -67,6 +70,10 @@ interface DataResponse {
 
 interface IssueMetadata {
     label: string
+    amount: string
+    txID: string
+    solverAvatar: string
+    solverUsername: string
 }
 
 interface IssueObject {
