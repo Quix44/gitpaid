@@ -63,7 +63,7 @@ const Provider = ({ children }: any) => {
                     },
                 },
                 walletConnectorExtensions: [EthersExtension],
-                environmentId: '46c4b660-c6c1-462e-817e-1cf4459ac07f',
+                environmentId: process.env.ENVIRONMENT_ID || "46c4b660-c6c1-462e-817e-1cf4459ac07f" as string,
                 walletConnectors: [EthereumWalletConnectors],
             }}>
             <DynamicWagmiConnector>
