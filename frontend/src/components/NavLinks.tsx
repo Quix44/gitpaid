@@ -1,6 +1,6 @@
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import Link from 'next/link'
-import { Button } from './ui/button'
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import Link from 'next/link';
+import { Button } from './ui/button';
 
 function NavLinks() {
     const { user, isAuthenticated } = useDynamicContext()

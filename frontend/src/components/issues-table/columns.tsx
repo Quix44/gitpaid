@@ -7,6 +7,12 @@ import Image from "next/image"
 import { statuses } from "../data/data"
 import { IssueTask } from "../data/schema"
 import { Badge } from "../ui/badge"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
@@ -106,16 +112,38 @@ export const columns: ColumnDef<IssueTask>[] = [
         (status) => status.value === row.getValue("status")
       )
 
+
+
+
+      const isStatusPresent = Boolean(status); // Determines if status is present
+      const textColorClass = isStatusPresent ? 'text-green-500' : 'text-red-500'; // Choose color based on status presence
+
       if (!status) {
         return null
       }
 
       return (
         <div className="flex w-[100px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+          {isStatusPresent && status.icon && (
+            <status.icon className={`mr-2 h-4 w-4 ${textColorClass}`} />
           )}
-          <span>{status.label}</span>
+          {isStatusPresent ? (
+            // If status is present, display its label with the appropriate text color
+            <span className={textColorClass}>{status.label}</span>
+          ) : (
+            // If status is not present, show "No Status" with a tooltip in red
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-red-500">No Status</span>
+                </TooltipTrigger>
+                <TooltipContent className="bg-card">
+                  <h4 className="font-medium leading-none">Status Unavailable</h4>
+                  {/* You can add more context or remove these placeholders as needed */}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       )
     },
