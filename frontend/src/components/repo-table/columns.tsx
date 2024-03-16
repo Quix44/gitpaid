@@ -1,14 +1,18 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-
-
-import { statuses } from "../data/data"
+import ConnectRepositoryButton from "../ConnectRepositoryButton"
 import { RepositoryTask } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
+const openRepo = (repoURL: string | undefined) => {
+  if (!repoURL) return
+  window.open(repoURL, '_blank', 'noopener,noreferrer');
+}
 export const columns: ColumnDef<RepositoryTask>[] = [
+
+
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -51,7 +55,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       // const label = labels.find((label) => label.value === row.original.label)
 
       return (
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 max-w-[5rem]">
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[500px] truncate font-medium">
             {row.getValue("name")}
@@ -69,7 +73,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       // const label = labels.find((label) => label.value === row.original.label)
 
       return (
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.url)}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
           <span className="max-w-[500px] truncate font-medium">
             {row.getValue("description")}
@@ -114,27 +118,42 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       )
     },
   },
+  // {
+  //   accessorKey: "status",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Status" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const status = statuses.find(
+  //       (status) => status.value === row.getValue("status")
+  //     )
+
+  //     if (!status) {
+  //       return null
+  //     }
+
+  //     return (
+  //       <div className="flex w-[100px] items-center">
+  //         {status.icon && (
+  //           <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+  //         )}
+  //         <span>{status.label}</span>
+  //       </div>
+  //     )
+  //   },
+  //   filterFn: (row, id, value) => {
+  //     return value.includes(row.getValue(id))
+  //   },
+  // },
   {
-    accessorKey: "status",
+    accessorKey: "connect",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Connect" />
     ),
     cell: ({ row }) => {
-      const status = statuses.find(
-        (status) => status.value === row.getValue("status")
-      )
-
-      if (!status) {
-        return null
-      }
 
       return (
-        <div className="flex w-[100px] items-center">
-          {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-          )}
-          <span>{status.label}</span>
-        </div>
+        <ConnectRepositoryButton connected={row.original.connected} />
       )
     },
     filterFn: (row, id, value) => {
