@@ -7,7 +7,6 @@ function Searchinfo() {
                     <h1 className="grid col-span-2 scroll-m-20 font-extrabold tracking-tight lg:text-5xl items-center">
                         Git Started
                     </h1>
-                    {/* <Button variant={"secondary"} className="mt-0">Sign up</Button> */}
                 </div>
 
                 <div className="grid col-start-6 col-span-7 grid-cols-subgrid space-y-12 items-center">

@@ -8,9 +8,6 @@ export default function Home() {
       <Hero />
       <Statrow />
       <Searchinfo />
-
-
-
     </main>
   );
 }

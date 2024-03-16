@@ -15,6 +15,7 @@ const Provider = () => (
                 },
                 onAuthSuccess: () => {
                     console.log('in onAuthSuccess');
+                    window.location.href = "/dashboard"
                 },
                 onLogout: () => {
                     console.log('in onLogout');
