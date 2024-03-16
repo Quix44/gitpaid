@@ -13,8 +13,9 @@ const Provider = () => (
                 onAuthFlowOpen: () => {
                     console.log('in onAuthFlowOpen');
                 },
-                onAuthSuccess: () => {
+                onAuthSuccess: (data) => {
                     console.log('in onAuthSuccess');
+                    console.log(data)
                     window.location.href = "/issues"
                 },
                 onLogout: () => {
