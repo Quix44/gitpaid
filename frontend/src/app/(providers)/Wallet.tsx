@@ -21,6 +21,21 @@ const evmNetworks = [
         rpcUrls: ['https://arb-sepolia.g.alchemy.com/v2/Z8Y0CZXvhPgiTt8akdr4Z_dS03C2-H0X'],
         vanityName: 'Arbitrum Sepolia',
     },
+    {
+        blockExplorerUrls: ['https://sepolia.basescan.org/'],
+        chainId: 84532,
+        chainName: 'Arbitrum Sepolia',
+        iconUrls: ['https://app.dynamic.xyz/assets/networks/base.svg'],
+        name: 'Base Sepolia',
+        nativeCurrency: {
+            decimals: 18,
+            name: 'Base Sepolia Ether',
+            symbol: 'SEP',
+        },
+        networkId: 84532,
+        rpcUrls: ['https://cosmological-long-violet.base-sepolia.quiknode.pro/77b360c7f8668f55c31ea3bb6b4a086f9e06bf1d/'],
+        vanityName: 'Base Sepolia',
+    },
 ];
 
 const Provider = ({ children }: any) => {
