@@ -3,8 +3,10 @@
 import { ColumnDef } from "@tanstack/react-table"
 
 
+import Provider from "@/app/(providers)/Wallet"
 import { statuses } from "../data/data"
 import { RepositoryTask } from "../data/schema"
+import { FundButton } from "../fund-button"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 
@@ -142,7 +144,24 @@ export const columns: ColumnDef<RepositoryTask>[] = [
     },
   },
   {
+    accessorKey: "fund",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Fund" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex w-[100px] items-center">
+          <Provider>
+            <FundButton repository={String(row.original.id)} />
+          </Provider>
+        </div>
+      )
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ]
+
+
