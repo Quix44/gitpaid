@@ -3,6 +3,8 @@ import { columns } from "@/components/issues-table/columns"
 import { DataTable } from "@/components/issues-table/data-table"
 import { UserNav } from "@/components/issues-table/user-nav"
 import { Metadata } from "next"
+import { z } from "zod"
+import { issueSchema } from "../data/schema"
 
 export const metadata: Metadata = {
     title: "Tasks",
@@ -12,15 +14,23 @@ export const metadata: Metadata = {
 // Simulate a database read for tasks.
 async function getIssues() {
     const apiKey = process.env.EMITLY_API_KEY as string
-    console.log(apiKey)
     const url = `https://api.emitly.dev/v1/webhook?listenerId=fn_231fbbe718228828ed3f1d56d88b24e9&apikey=${apiKey}&issues=true`
+    const response = await fetch(url, { method: 'POST' })
 
-    const response = await fetch(url)
-    console.log(response)
     const jsonData = await response.json()
-    console.log(jsonData)
-    // Get Issues from DyanmoDB
-    return jsonData
+    const _data: IssueObject[] = jsonData.body.map((y: { Data: any }) => y.Data)
+    const outputIssues = []
+    for (const issue of _data) {
+        outputIssues.push({
+            id: issue.Issue.ID,
+            repository: issue.Repo.Name,
+            description: issue.Issue.Title,
+            creator: issue.Sender.Login,
+            label: "No Label", // issue.Issue.Labels[0]?.name
+            status: issue.Issue.State
+        })
+    }
+    return z.array(issueSchema).parse(outputIssues);
 }
 
 export async function Table() {
@@ -45,3 +55,181 @@ export async function Table() {
 }
 
 export default Table
+
+
+interface IssueObject {
+    Action: string;
+    Assignee?: any;
+    Changes?: any;
+    Installation?: any;
+    Issue: Issue;
+    Label?: any;
+    Repo: Repo;
+    Sender: Sender;
+}
+
+interface Sender {
+    AvatarURL: string;
+    Bio?: any;
+    Blog?: any;
+    Collaborators?: any;
+    Company?: any;
+    CreatedAt?: any;
+    DiskUsage?: any;
+    Email?: any;
+    EventsURL: string;
+    Followers?: any;
+    FollowersURL: string;
+    Following?: any;
+    FollowingURL: string;
+    GistsURL: string;
+    GravatarID: string;
+    HTMLURL: string;
+    Hireable?: any;
+    ID: number;
+    Location?: any;
+    Login: string;
+    Name?: any;
+    NodeID: string;
+    OrganizationsURL: string;
+    OwnedPrivateRepos?: any;
+    Permissions?: any;
+    Plan?: any;
+    PrivateGists?: any;
+    PublicGists?: any;
+    PublicRepos?: any;
+    ReceivedEventsURL: string;
+    ReposURL: string;
+    SiteAdmin: boolean;
+    StarredURL: string;
+    SubscriptionsURL: string;
+    SuspendedAt?: any;
+    TextMatches?: any;
+    TotalPrivateRepos?: any;
+    Type: string;
+    URL: string;
+    UpdatedAt?: any;
+}
+
+interface Repo {
+    AllowMergeCommit?: any;
+    AllowRebaseMerge?: any;
+    AllowSquashMerge?: any;
+    ArchiveURL: string;
+    Archived: boolean;
+    AssigneesURL: string;
+    AutoInit?: any;
+    BlobsURL: string;
+    BranchesURL: string;
+    CloneURL: string;
+    CodeOfConduct?: any;
+    CollaboratorsURL: string;
+    CommentsURL: string;
+    CommitsURL: string;
+    CompareURL: string;
+    ContentsURL: string;
+    ContributorsURL: string;
+    CreatedAt: CreatedAt;
+    DefaultBranch: string;
+    DeploymentsURL: string;
+    Description?: any;
+    DownloadsURL: string;
+    EventsURL: string;
+    Fork: boolean;
+    ForksCount: number;
+    ForksURL: string;
+    FullName: string;
+    GitCommitsURL: string;
+    GitRefsURL: string;
+    GitTagsURL: string;
+    GitURL: string;
+    GitignoreTemplate?: any;
+    HTMLURL: string;
+    HasDownloads: boolean;
+    HasIssues: boolean;
+    HasPages: boolean;
+    HasProjects: boolean;
+    HasWiki: boolean;
+    Homepage?: any;
+    HooksURL: string;
+    ID: number;
+    IssueCommentURL: string;
+    IssueEventsURL: string;
+    IssuesURL: string;
+    KeysURL: string;
+    LabelsURL: string;
+    Language?: any;
+    LanguagesURL: string;
+    License?: any;
+    LicenseTemplate?: any;
+    MasterBranch?: any;
+    MergesURL: string;
+    MilestonesURL: string;
+    MirrorURL?: any;
+    Name: string;
+    NetworkCount?: any;
+    NodeID: string;
+    NotificationsURL: string;
+    OpenIssuesCount: number;
+    Organization?: any;
+    Owner: any[];
+    Parent?: any;
+    Permissions?: any;
+    Private: boolean;
+    PullsURL: string;
+    PushedAt: CreatedAt;
+    ReleasesURL: string;
+    SSHURL: string;
+    SVNURL: string;
+    Size: number;
+    Source?: any;
+    StargazersCount: number;
+    StargazersURL: string;
+    StatusesURL: string;
+    SubscribersCount?: any;
+    SubscribersURL: string;
+    SubscriptionURL: string;
+    TagsURL: string;
+    TeamID?: any;
+    TeamsURL: string;
+    TextMatches?: any;
+    Topics: any[];
+    TreesURL: string;
+    URL: string;
+    UpdatedAt: CreatedAt;
+    WatchersCount: number;
+}
+
+interface CreatedAt {
+}
+
+interface Issue {
+    ActiveLockReason?: any;
+    Assignee?: any;
+    Assignees: any[];
+    Body?: any;
+    ClosedAt: string;
+    ClosedBy?: any;
+    Comments: number;
+    CommentsURL: string;
+    CreatedAt: string;
+    EventsURL: string;
+    HTMLURL: string;
+    ID: number;
+    Labels: any[];
+    LabelsURL: string;
+    Locked: boolean;
+    Milestone?: any;
+    NodeID: string;
+    Number: number;
+    PullRequestLinks?: any;
+    Reactions: any[];
+    Repository?: any;
+    RepositoryURL: string;
+    State: string;
+    TextMatches?: any;
+    Title: string;
+    URL: string;
+    UpdatedAt: string;
+    User: any[];
+}
