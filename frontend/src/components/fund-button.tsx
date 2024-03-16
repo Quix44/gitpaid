@@ -110,7 +110,7 @@ export function FundButton({ repository }: { repository: string }) {
                         </Label>
                         <Input onChange={(e) => setAmount(Number(e.target.value))} type="number" placeholder="Amount" id="link" />
                     </div>
-                    <Button variant={'ghost'} type="submit" size="sm" className="px-3" onClick={(e) => {
+                    <Button variant={'ghost'} size="sm" className="px-3" onClick={(e) => {
                         e.preventDefault()
                         if (allowance === 0n) {
                             approvalWrite?.()

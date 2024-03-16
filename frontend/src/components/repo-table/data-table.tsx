@@ -25,8 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { DataTablePagination } from "@/components/issues-table/data-table-pagination"
-import { DataTableToolbar } from "@/components/issues-table/data-table-toolbar"
+import { DataTablePagination } from "@/components/repo-table/data-table-pagination"
+import { DataTableToolbar } from "@/components/repo-table/data-table-toolbar"
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 
 interface DataTableProps<TData, TValue> {
