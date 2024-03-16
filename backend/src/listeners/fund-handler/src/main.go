@@ -79,6 +79,21 @@ func HandleRequest(ctx context.Context, r LambdaEvent) {
 	payeeAddress := r.Event.Args[2]
 	amount := r.Event.Args[3]
 
+	symbol := ""
+	tokenSymbolUrl := ""
+
+	switch tokenAddress {
+	case "0x06AAbf9A55D604177f273999E3dD9Da76f11c9fa":
+		symbol = "APE"
+		tokenSymbolUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/18876.png"
+	case "0x9BF9Fd5c1093dc9f911735763371431aaBBc7A71":
+		symbol = "ARB"
+		tokenSymbolUrl = "https://arbiscan.io/token/images/arbitrumone2_32_new.png"
+	case "0x1B2F2eed297d6257E9F966E3f375a4e450f4032A":
+		symbol = "USDC"
+		tokenSymbolUrl = "https://smartcontract.imgix.net/tokens/usdc.webp"
+	}
+
 	keyCond := expression.KeyEqual(expression.Key("typename"), expression.Value("Repository"))
 	filter := expression.Name("id").Equal(expression.Value(repository))
 
@@ -120,6 +135,8 @@ func HandleRequest(ctx context.Context, r LambdaEvent) {
 		tokenAddress,
 		payeeAddress,
 		amount,
+		symbol,
+		tokenSymbolUrl,
 	}
 	marshalMap, err := attributevalue.MarshalMap(newMap)
 	if err != nil {
@@ -180,6 +197,8 @@ type TokenMetadata struct {
 	TokenAddress    string `json:"tokenAddress" dynamodbav:"tokenAddress"`
 	PayeeAddress    string `json:"payeeAddress" dynamodbav:"payeeAddress"`
 	Amount          string `json:"amount" dynamodbav:"amount"`
+	Symbol          string `json:"symbol" dynamodbav:"symbol"`
+	TokenSymbolUrl  string `json:"tokenSymbolUrl" dynamodbav:"tokenSymbolUrl"`
 }
 
 func QueryDynamoDB[T any](ctx context.Context, queryInput dynamodb.QueryInput) ([]T, error) {

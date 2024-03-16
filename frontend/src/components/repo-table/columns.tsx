@@ -39,15 +39,15 @@ export const columns: ColumnDef<RepositoryTask>[] = [
   //   enableSorting: false,
   //   enableHiding: false,
   // },
-  {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
-    ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Task" />
+  //   ),
+  //   cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -77,8 +77,26 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.url)}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[200px] truncate font-medium">
             {row.getValue("description")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "fundedAmount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Funded Amount" />
+    ),
+    cell: ({ row }) => {
+      // const label = labels.find((label) => label.value === row.original.label)
+
+      return (
+        <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.fundedAmount)}>
+          {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
+          <span className="max-w-[200px] truncate font-medium">
+            {row.getValue("fundedAmount")}
           </span>
         </div>
       )

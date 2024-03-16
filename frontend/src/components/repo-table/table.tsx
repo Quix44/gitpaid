@@ -1,5 +1,6 @@
 import Provider from "@/app/(providers)/Wallet"
 import { columns } from "@/components/repo-table/columns"
+import { ethers } from 'ethers'
 import { Metadata } from "next"
 import { z } from "zod"
 import { repoSchema } from "../data/schema"
@@ -25,6 +26,7 @@ async function getRepos(username: string | null) {
             name: repo.Data.name,
             description: repo.Data.description || "NA",
             connected: repo.Metadata ? true : false,
+            fundedAmount: Math.floor(+ethers.utils.formatUnits(repo.Metadata?.amount || "0", 'ether')).toString(),
             creator: repo.Data.owner.login,
             label: repo.Data.language,
             amount: repo.Metadata?.amount ?? "",
@@ -160,6 +162,8 @@ interface RepoMetadata {
     chainID: string;
     contractAddress: string;
     payeeAddress: string;
+    tokenSymbol: string;
+    tokenSymbolUrl?: string;
     rpc: string;
     tokenAddress: string;
 }

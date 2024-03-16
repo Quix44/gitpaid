@@ -19,6 +19,7 @@ export const repoSchema = z.object({
   name: z.string(),
   connected: z.boolean(),
   creator: z.string(),
+  fundedAmount: z.string().optional(),
   description: z.string().optional(),
   amount: z.string().optional(),
   label: z.union([z.string(), z.undefined(), z.null()]),
