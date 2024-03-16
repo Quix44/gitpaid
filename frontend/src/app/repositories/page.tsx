@@ -15,7 +15,7 @@ function Page({
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight title text-primary">Here are your repositories</h2>
                     <p className="text-muted-foreground">
-                        Here&apos;s a list of your tasks for this month!
+                        Connect, Fund and start creating GitHub Issues!
                     </p>
                 </div>
                 <ImportRepo />
