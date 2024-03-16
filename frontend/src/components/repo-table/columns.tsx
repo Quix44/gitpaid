@@ -60,8 +60,8 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.fundedAmount)}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[50px] truncate font-medium">
-            {row.getValue("fundedAmount")}
+          <span className="max-w-[80px] truncate font-medium">
+            {row.getValue("fundedAmount")} {parseInt(row.getValue("fundedAmount")) > 0 ? "USDC" : null}
           </span>
         </div>
       )
