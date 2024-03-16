@@ -8,7 +8,10 @@ import { statuses } from "../data/data"
 import { IssueTask } from "../data/schema"
 import { Badge } from "../ui/badge"
 import {
-  Tooltip
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "../ui/tooltip"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -121,9 +124,20 @@ export const columns: ColumnDef<IssueTask>[] = [
           )}
           {!status ? (
             // When there's no status, wrap the "No Status" text in a Tooltip
-            <Tooltip content="No Status Available" position="top">
-              <span className={textColorClass}>No Status</span>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>Hover</TooltipTrigger>
+                <TooltipContent>
+                  <h4 className="font-medium leading-none">This issue was closed By: Name</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Amount paid:<b>money</b>
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    link
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ) : (
             // Render status label with appropriate text color when status exists
             <span className={textColorClass}>{status.label}</span>
