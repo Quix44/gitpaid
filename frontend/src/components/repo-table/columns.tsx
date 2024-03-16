@@ -22,9 +22,9 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       // const label = labels.find((label) => label.value === row.original.label)
 
       return (
-        <div className="flex space-x-2 max-w-[5rem]">
+        <div className="flex space-x-2 max-w-[7rem]">
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="truncate font-medium">
             {row.getValue("name")}
           </span>
         </div>
@@ -42,7 +42,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex space-x-2 cursor-pointer" onClick={() => openRepo(row.original.url)}>
           {/* {label && <Badge variant="outline">{label.label}</Badge>} */}
-          <span className="max-w-[300px] truncate font-medium">
+          <span className="max-w-[200px] truncate font-medium">
             {row.getValue("description")}
           </span>
         </div>
@@ -154,7 +154,7 @@ export const columns: ColumnDef<RepositoryTask>[] = [
       return (
         <div className="flex w-[100px] items-center">
           <Provider>
-            <FundButton connected={row.original.connected} repository={String(row.original.id)} />
+            <FundButton repository={String(row.original.id)} connected={row.original.connected} />
           </Provider>
         </div>
       )
