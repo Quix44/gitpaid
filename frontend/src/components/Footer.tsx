@@ -5,8 +5,6 @@ const Footer = () => {
             <div className="container px-5 py-8 mx-auto flex items-center sm:flex-row flex-col">
                 <a className="flex title-font font-medium items-center md:justify-start justify-center text-gray-900">
                     <Image src="/somnio_logo.svg" alt="logo" width={112} height={40} />
-                    <span className="ml-3 text-xl">Somnio.io</span>
-                    <span className="ml-3 text-xl text-white">Somnio.io</span>
                 </a>
                 <p className="text-sm text-white sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">© 2024 Team Somnio —
                     <a href="https://twitter.com/knyttneve" className="text-white ml-1" rel="noopener noreferrer" target="_blank">@somnio_io</a>
