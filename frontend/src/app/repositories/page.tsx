@@ -1,5 +1,5 @@
+import ImportRepo from "@/components/ImportRepo";
 import Table from "@/components/repo-table/table";
-import ImportRepo from "../../components/ImportRepo";
 
 function Page({
     params,

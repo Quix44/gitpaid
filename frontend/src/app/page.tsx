@@ -10,9 +10,6 @@ export default function Home() {
       <Statrow />
       <Searchinfo />
       <Helpinfo />
-
-
-
     </main>
   );
 }

@@ -3,6 +3,8 @@ import { columns } from "@/components/repo-table/columns"
 import { ethers } from 'ethers'
 import { Metadata } from "next"
 import { z } from "zod"
+import ImportRepo from "../ImportRepo"
+import RepoInfoRow from "../RepoInfoRow"
 import { repoSchema } from "../data/schema"
 import { DataTable } from "./data-table"
 
@@ -41,6 +43,16 @@ export async function Table({ username }: { username: string | null }) {
     return (
         <div className={`hidden h-full flex-1 flex-col space-y-8 p-8 md:flex`}>
             <Provider>
+                <RepoInfoRow />
+                <div className="flex justify-between w-full">
+                    <div>
+                        <h2 className="text-2xl font-bold tracking-tight title text-white">Here are your repositories</h2>
+                        <p className="text-muted-foreground">
+                            Connect, Fund and start creating GitHub Issues!
+                        </p>
+                    </div>
+                    <ImportRepo />
+                </div>
                 <DataTable data={tasks} columns={columns} />
             </Provider>
         </div >
