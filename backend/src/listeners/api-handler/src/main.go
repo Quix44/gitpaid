@@ -387,11 +387,12 @@ func PutItemInDynamoDB[T any](ctx context.Context, tableName string, item T) err
 }
 
 type DynamoItem struct {
-	ID        string    `dynamodbav:"id"` // Ensure this tag matches DynamoDB's key name
+	ID        string    `dynamodbav:"id"`
 	CreatedAt time.Time `dynamodbav:"createdAt"`
 	UpdatedAt time.Time `dynamodbav:"updatedAt"`
 	Typename  string    `dynamodbav:"typename"`
 	Data      any       `dynamodbav:"data"`
+	Metadata  any       `dynamodbav:"metadata"`
 }
 
 type GithubRepo struct {
