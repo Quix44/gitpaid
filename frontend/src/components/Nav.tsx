@@ -5,6 +5,7 @@ import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import Image from 'next/image';
 import Link from 'next/link';
 import NavLinks from './NavLinks';
+import { Button } from './ui/button';
 
 function Nav() {
     return (
@@ -15,7 +16,7 @@ function Nav() {
             <div className="flex space-between items-center space-x-4">
                 <Provider>
                     <NavLinks />
-                    <DynamicWidget />
+                    <DynamicWidget innerButtonComponent={<Button>Login</Button>} />
                 </Provider>
             </div>
         </nav>
