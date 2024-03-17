@@ -22,10 +22,10 @@ function RepoInfoRow() {
                 </div>
                 <div className="col-span-2 ">
                     <h2 className="scroll-m-20  pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-                        FUND
+                        LINK
                     </h2>
                     <p className="leading-7 [&:not(:first-child)]:mt-0">
-                        With Your Tokens
+                        Your Webhook URL
                     </p>
                 </div>
             </div>
@@ -35,10 +35,10 @@ function RepoInfoRow() {
                 </div>
                 <div className="col-span-2 ">
                     <h2 className="scroll-m-20  pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-                        APPLY
+                        FUND
                     </h2>
                     <p className="leading-7 [&:not(:first-child)]:mt-0">
-                        Your Webhook URL
+                        With any ERC20 Token
                     </p>
 
                 </div>
